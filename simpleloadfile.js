@@ -68,7 +68,7 @@
 
                     if( !temp.cache )
                     {
-                        temp.file += '{0}simpleloadfile={1}'.replace('{0}',((/\?.*\=/).test(temp.file)?'&':'?')).replace('{1}', (10000*Math.random()));
+                        temp.file += '{0}simpleloadfile={1}'.replace('{0}',((/\?.*\=/).test(temp.file)?'&':'?')).replace('{1}', (1e5*Math.random()));
                     }
 
                     lf.que.push(temp);
