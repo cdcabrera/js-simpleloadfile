@@ -35,6 +35,10 @@
                 tempObj.error = (file.error)? file.error : null;
                 tempObj.timeout = (file.timeout)? file.timeout : timeout;
 
+                if ( !tempObj.cache ) {
+                    tempObj.file += '{0}resourceLoad={1}'.replace('{0}',((/\?.*\=/).test(tempObj.file)?'&':'?')).replace('{1}', (1e5*Math.random()));
+                }
+
                 setupQue.push(tempObj);
             }
 
@@ -138,6 +142,7 @@
             }
 
             if ( callback ) {
+                
                 callback.call(domContext, type.type, file.file);
             }
 
