@@ -60,7 +60,7 @@
                     temp.qued = true;
                     temp.cache = (temp.cache == undefined || temp.cache)? true : false;
                     temp.file = (typeof temp.file == 'string')? temp.file.replace(/\s+$/,'') : '';
-                    temp.type = (temp.type)? temp.type : ((/\.js.*$/i).test(temp.file))? 'js': 'css';
+                    temp.type = (temp.type)? temp.type.toLowerCase() : ((/\.js.*$/i).test(temp.file))? 'js': 'css';
                     temp.global = (temp.global)? true : false;
                     temp.success = (temp.success)? temp.success : null;
                     temp.error = (temp.error)? temp.error : null;
