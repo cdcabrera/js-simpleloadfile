@@ -2,67 +2,92 @@
 
     'use strict';
 
-    window.resourceLoad = (function (window, undefined){
+    /**
+     * Load JS and CSS files.
+     * @param initFiles
+     * @returns {Expose}
+     */
+    window.resourceLoad = function (initFiles) {
 
         var _settings = {
-            timeout: 10000
+            files:      initFiles,
+            timeout:    10000
         };
 
+        /**
+         * Expose methods and property.
+         * @param files
+         * @returns {Expose}
+         * @constructor
+         */
+        function Expose (files) {
 
-        function Initialize ( context, files ) {
+            this.files = files;
+
+            new Initialize(this, files);
+
+            return this;
+        }
+
+        /**
+         * Internally initialize.
+         * @param context
+         * @param files
+         * @constructor
+         */
+        function Initialize (context, files) {
 
             this.exposeContext = context;
             this.setup(files);
         }
 
+        /**
+         * Standardize file input(s) for loading.
+         * @param files
+         */
+        Initialize.prototype.setup = function (files) {
 
-        Initialize.prototype.setup = function ( files ) {
+            files = (Object.prototype.toString.call(files) == '[object Array]') ? files : [{file: files}];
 
-            files = (Object.prototype.toString.call(files) == '[object Array]')? files : [{file:files}];
-
-            var setupQue= [],
+            var setupQue = [],
                 timeout = _settings.timeout;
 
-            for (var i=0; i<files.length; i++) {
+            for (var i = 0; i < files.length; i++) {
 
                 var tempObj = {},
-                    file    = ( typeof files[i] === 'string' )? {file:files[i]} : files[i];
+                    file    = ( typeof files[i] === 'string' ) ? {file: files[i]} : files[i];
 
-                tempObj.cache = (file.cache === undefined || file.cache)? true : false;
-                tempObj.file = (typeof file.file === 'string')? file.file.replace(/\s+$/,'') : '';
-                tempObj.type = (file.type)? file.type.toLowerCase() : ((/\.js.*$/i).test(file.file))? 'js': 'css';
-                tempObj.success = (file.success)? file.success : null;
-                tempObj.error = (file.error)? file.error : null;
-                tempObj.timeout = (file.timeout)? file.timeout : timeout;
+                tempObj.cache   = (file.cache === undefined || file.cache) ? true : false;
+                tempObj.file    = (typeof file.file === 'string') ? file.file.replace(/\s+$/, '') : '';
+                tempObj.type    = (file.type) ? file.type.toLowerCase() : ((/\.js.*$/i).test(file.file)) ? 'js' : 'css';
+                tempObj.success = (file.success) ? file.success : null;
+                tempObj.error   = (file.error) ? file.error : null;
+                tempObj.timeout = (file.timeout) ? file.timeout : timeout;
 
-                if ( !tempObj.cache ) {
-                    tempObj.file += '{0}resourceLoad={1}'.replace('{0}',((/\?.*\=/).test(tempObj.file)?'&':'?')).replace('{1}', (1e5*Math.random()));
+                if (!tempObj.cache) {
+                    tempObj.file += '{0}resourceLoad={1}'.replace('{0}', ((/\?.*\=/).test(tempObj.file) ? '&' : '?')).replace('{1}', (1e5 * Math.random()));
                 }
 
                 setupQue.push(tempObj);
             }
 
-            this.que( setupQue );
+            this.loadFiles(setupQue);
         };
 
-
-        Initialize.prototype.que = function ( files ) {
-
-            this.loadFiles( files );
-        };
-
-
-        Initialize.prototype.loadFiles = function ( files ) {
+        /**
+         * Start loading files.
+         * @param files
+         */
+        Initialize.prototype.loadFiles = function (files) {
 
             var selfContext = this,
                 file        = files[0],
-                element     = (file.type === 'js')? document.createElement('script') : document.createElement('link'),
+                element     = (file.type === 'js') ? document.createElement('script') : document.createElement('link'),
                 head        = (document.head || document.getElementsByTagName('head')[0] || document.documentElement),
-                timeout     = setTimeout(function(){ element.onload( {type:'timeout'} ); }, file.timeout),
+                timeout     = setTimeout(function () { element.onload({type: 'timeout'}); }, file.timeout),
                 fallback    = false;
 
-            switch ( file.type )
-            {
+            switch (file.type) {
                 case 'js':
                     element.async = true;
                     element.src = file.file;
@@ -75,7 +100,7 @@
             }
 
 
-            if ( 'hasOwnProperty' in element && 'onload' in element ) {
+            if ('hasOwnProperty' in element && 'onload' in element) {
 
                 element.onerror = element.onload = function (type) {
 
@@ -85,20 +110,22 @@
 
                     var self = this;
 
-                    setTimeout(function (){ selfContext.processEvent(self, type, files); },0);
+                    setTimeout(function () {
+                        selfContext.processEvent(self, type, files);
+                    }, 0);
                 };
 
-            } else if ( element.readyState ) {
+            } else if (element.readyState) {
 
                 element.onload = element.onreadystatechange = function (type) {
 
-                    if( !(this.readyState) || /loaded|complete/.test( this.readyState ) ) {
+                    if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
 
                         clearTimeout(timeout);
 
                         this.onload = this.onreadystatechange = null;
 
-                        selfContext.processEvent(this, {type:'contextfail'}, files);
+                        selfContext.processEvent(this, {type: 'contextfail'}, files);
                     }
                 };
 
@@ -109,8 +136,7 @@
             }
 
 
-            switch ( file.type )
-            {
+            switch (file.type) {
                 case 'js':
                     head.insertBefore(element, head.firstChild);
                     break;
@@ -121,80 +147,94 @@
             }
 
 
-            if ( fallback ) {
+            if (fallback) {
 
-                selfContext.processEvent(element, {type:'contextfail'}, files);
+                selfContext.processEvent(element, {type: 'contextfail'}, files);
             }
 
         };
 
-
-
-        Initialize.prototype.processEvent = function ( domContext, type, files ) {
+        /**
+         * Process load and error events for a file, then start the process over for the next.
+         * @param domContext
+         * @param type
+         * @param files
+         */
+        Initialize.prototype.processEvent = function (domContext, type, files) {
 
             var file        = files.shift(),
                 isError     = (type && (type.type === 'error' || type.type === 'timeout')),
-                callback    = (isError)? file.error : file.success;
+                callback    = (isError) ? file.error : file.success;
 
-            if ( domContext.parentNode && file.type === 'js' ) {
+            if (domContext.parentNode && file.type === 'js') {
 
-                domContext.parentNode.removeChild( domContext );
+                domContext.parentNode.removeChild(domContext);
             }
 
-            if ( callback ) {
-                
+            if (callback) {
+
                 callback.call(domContext, type.type, file.file);
             }
 
-            if ( isError && this.exposeContext.error ) {
+            if (isError && this.exposeContext.error.active) {
 
                 this.exposeContext.error.call(this.exposeContext, type.type);
                 return;
             }
 
-            if ( files.length ) {
+            if (files.length) {
 
-                this.que( files );
+                this.loadFiles(files);
 
             } else {
 
-                if( this.exposeContext.success ) {
+                if (this.exposeContext.success.active) {
 
                     this.exposeContext.success.call(this.exposeContext, type.type);
                 }
             }
         };
 
-
-
-        return {
-
-            load: function (files) {
-
-                new Initialize(this, files);
-                return this;
-            },
+        /**
+         * Exposed methods.
+         * @type {{complete: Function, success: Function, error: Function}}
+         */
+        Expose.prototype = {
 
             complete: function (success, error) {
 
-                this.success = function() { success.apply(this, arguments) };
-                this.error = function() { error.apply(this, arguments) };
+                this.success = function () {
+                    success.apply(this, arguments)
+                };
+                this.success.active = true;
+
+                this.error = function () {
+                    error.apply(this, arguments)
+                };
+                this.error.active = true;
                 return this;
             },
 
             success: function (success) {
 
-                this.success = function() { success.apply(this, arguments) };
+                this.success = function () {
+                    success.apply(this, arguments)
+                };
+                this.success.active = true;
                 return this;
             },
 
             error: function (error) {
 
-                this.error = function() { error.apply(this, arguments) };
+                this.error = function () {
+                    error.apply(this, arguments)
+                };
+                this.error.active = true;
                 return this;
             }
         };
 
-    })(this);
+        return new Expose(_settings.files);
+    };
 
 })(this);
