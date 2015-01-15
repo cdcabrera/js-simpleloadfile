@@ -269,22 +269,15 @@
 
             complete: function (success, error) {
 
-                this.success = function () {
-                    success.apply(this, arguments)
-                };
-                this.success.active = true;
-
-                this.error = function () {
-                    error.apply(this, arguments)
-                };
-                this.error.active = true;
+                this.success(success);
+                this.error(error);
                 return this;
             },
 
             success: function (success) {
 
                 this.success = function () {
-                    success.apply(this, arguments)
+                    success.apply(this, arguments);
                 };
                 this.success.active = true;
                 return this;
@@ -293,7 +286,7 @@
             error: function (error) {
 
                 this.error = function () {
-                    error.apply(this, arguments)
+                    error.apply(this, arguments);
                 };
                 this.error.active = true;
                 return this;
