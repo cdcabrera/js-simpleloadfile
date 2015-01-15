@@ -9,12 +9,8 @@
      */
     window.resourceLoad = function (initFiles) {
 
-        var _parent = this;
-
-        var _settings = {
-            files:      initFiles,
-            timeout:    10000
-        };
+        var _parent     = this,
+            _settings   = { files:initFiles, timeout:10000 };
 
         /**
          * Expose methods and property.
@@ -83,21 +79,14 @@
                 setupQueue.push(tempObj);
             }
 
-            //this.loadFiles(setupQueue);
             this.checkQueue(setupQueue);
         };
 
-
+        /**
+         * Process the "wait" for files by checking against already loaded files.
+         * @param files
+         */
         Initialize.prototype.checkQueue = function (files) {
-
-            if (!files.length) {
-
-                if (this.exposeContext.error.active && _parent.filesToLoad.length) {
-                    this.exposeContext.error.call(this.exposeContext, 'waiting', _parent.filesToLoad);
-                }
-
-                return;
-            }
 
             if (!_parent.filesLoaded) {
                 _parent.filesLoaded = {};
@@ -130,6 +119,15 @@
                 }
             }
 
+            if (!files.length) {
+
+                if (this.exposeContext.error.active && _parent.filesToLoad.length) {
+                    this.exposeContext.error.call(this.exposeContext, 'waiting', _parent.filesToLoad);
+                }
+
+                return;
+            }
+
             if (files[0].wait) {
                 _parent.filesToLoad.push(files[0]);
                 files.shift();
@@ -140,35 +138,6 @@
                 this.loadFiles(files);
             }
 
-
-
-
-            /*
-             _parent.filesLoaded[file.id] = file.file;
-
-            if (file.wait) {
-
-                for (var i=0; i<file.wait.length; i++) {
-
-                    if (!(file.wait[i] in _parent.filesLoaded)) {
-                        wait = true;
-                        break;
-                    }
-                }
-
-                if (wait) {
-                    _parent.filesToLoad.push(file);
-                    files.shift();
-                }
-            }
-
-            if (files.length) {
-                this.loadFiles(files);
-
-            } else if (this.exposeContext.error.active) {
-
-                this.exposeContext.error.call(this.exposeContext, 'waiting', _parent.filesToLoad);
-            }*/
         };
 
         /**
@@ -176,15 +145,6 @@
          * @param files
          */
         Initialize.prototype.loadFiles = function (files) {
-            /*
-            var check   = this.checkWait(files),//files[0]
-                file    = check.file;
-
-            files = check.files;
-
-            if (!file || !files.length) {
-                return;
-            }*/
 
             var selfContext = this,
                 file        = files[0],
@@ -261,55 +221,6 @@
         };
 
         /**
-         * Process the "wait" for files by checking against already loaded files.
-         * @param files
-         *//*
-        Initialize.prototype.checkWait = function (files) {
-
-            var file = files[0],
-                wait = false;
-
-            if (!_parent.filesLoaded) {
-
-                _parent.filesLoaded = {};
-            }
-
-            if (!_parent.filesToLoad) {
-
-                _parent.filesToLoad = [];
-            }
-
-            _parent.filesLoaded[file.id] = file.file;
-
-            if (!file.wait) {
-
-                return file;
-            }
-
-            for (var i=0; i<file.wait.length; i++) {
-
-                if (!file.wait[i] in _parent.filesLoaded) {
-
-                    wait = true;
-                    break;
-                }
-            }
-
-            if (wait) {
-
-                _parent.filesToLoad.push(file);
-
-                if (files[1]) {
-
-
-                }
-            }
-
-            return file;
-        };*/
-
-
-        /**
          * Process load and error events for a file, then start the process over for the next.
          * @param domContext
          * @param type
@@ -337,9 +248,8 @@
                 return;
             }
 
-            if (files.length) {
+            if (files.length || _parent.filesToLoad.length && !files.length) {
 
-                //this.loadFiles(files);
                 this.checkQueue(files);
 
             } else {
