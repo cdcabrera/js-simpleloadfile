@@ -4,13 +4,30 @@
 
     /**
      * Load JS and CSS files.
-     * @param initFiles
      * @returns {Expose}
      */
-    window.resourceLoad = function (initFiles) {
+    window.resourceLoad = function () {
 
         var _parent     = this,
-            _settings   = { files:initFiles, timeout:10000 };
+            _settings   = { timeout:10000, files:convertArguments.apply(null, arguments)},
+            _id;
+
+        //_parent.data = {};
+        resetData();
+
+        function getData (key) {
+            return (_parent.__data__[_id] && _parent.__data__[_id][key] || null);
+        }
+
+        function setData (key, value) {
+            _parent.__data__[_id][key] = value;
+        }
+
+        function resetData () {
+            _id = 1e5 * Math.random();
+            _parent.__data__ = {};
+            _parent.__data__[_id] = {};
+        }
 
         /**
          * Expose methods and property.
@@ -19,10 +36,14 @@
          * @constructor
          */
         function Expose (files) {
+            var self = this;
 
-            this.files = files;
+            this.files = _parent.displayFilesLoaded;
 
-            new Initialize(this, files);
+            //new Initialize(this, files);
+            setTimeout(function(){
+                new Initialize(self, files);
+            },0);
 
             return this;
         }
@@ -47,8 +68,9 @@
 
             files = (Object.prototype.toString.call(files) == '[object Array]') ? files : [{file: files}];
 
-            var setupQueue = [],
-                timeout = _settings.timeout;
+            var setupQueue  = [],
+                timeout     = _settings.timeout,
+                dataWait    = getData('wait');
 
             for (var i = 0; i < files.length; i++) {
 
@@ -69,8 +91,23 @@
                 }
 
                 if (tempObj.wait) {
-                    tempObj.wait = (Object.prototype.toString.call(tempObj.wait) == '[object Array]') ? tempObj.wait : [tempObj.wait];
+                    //tempObj.wait = (Object.prototype.toString.call(tempObj.wait) == '[object Array]') ? tempObj.wait : [tempObj.wait];
+                    tempObj.wait = convertArguments(tempObj.wait);
                 }
+
+                //console.log(this.exposeContext.wait.args);
+                //console.log(this.exposeContext.error.active);
+                //if (this.exposeContext.wait.args) {
+                console.log(dataWait+'');
+                console.log(tempObj.file);
+                if( dataWait ) {
+                    tempObj.wait = convertArguments(dataWait, tempObj.wait);
+                }
+
+                //console.log(this.exposeContext.wait.args);
+                //console.log(_parent[_id]);
+                //console.log(_parent.data.wait);
+                //console.log(getData('wait'));
 
                 if (!tempObj.cache) {
                     tempObj.file += '{0}resourceLoad={1}'.replace('{0}', ((/\?.*\=/).test(tempObj.file) ? '&' : '?')).replace('{1}', (1e5 * Math.random()));
@@ -90,43 +127,28 @@
 
             if (!_parent.filesLoaded) {
                 _parent.filesLoaded = {};
+                _parent.displayFilesLoaded = [];
             }
 
             if (!_parent.filesToLoad) {
                 _parent.filesToLoad = [];
             }
 
-            for (var i=0; i<_parent.filesToLoad.length; i++) {
-
-                var tempWait = false;
-
-                for (var k=0; k<_parent.filesToLoad[i].wait.length; k++) {
-
-                    if (!(_parent.filesToLoad[i].wait[k] in _parent.filesLoaded)) {
-                        tempWait = true;
-                        break;
-
-                    } else {
-
-                        _parent.filesToLoad[i].wait.splice(k,1);
-                    }
-                }
-
-                if (!tempWait) {
-                    _parent.filesToLoad[i].wait = null;
-                    files.push(_parent.filesToLoad[i]);
-                    _parent.filesToLoad.splice(i, 1);
-                }
-            }
+            files = this.checkFilesToLoad(files);
 
             if (!files.length) {
+                //var test = _parent.filesToLoad;
+                //console.log(window.bcbsncShopper);
 
-                if (this.exposeContext.error.active && _parent.filesToLoad.length) {
-                    this.exposeContext.error.call(this.exposeContext, 'waiting', _parent.filesToLoad);
-                }
+                this.processEvent(null, {type: 'waiting'}, [{error:null}]);
+                //if (this.exposeContext.error.active && _parent.filesToLoad.length) {
+                //    this.exposeContext.error.call(this.exposeContext, 'waiting', test);
+                //}
 
                 return;
             }
+
+
 
             if (files[0].wait) {
                 _parent.filesToLoad.push(files[0]);
@@ -135,9 +157,53 @@
 
             } else {
 
+                _parent.filesLoaded[files[0].id] = files[0].file;
+                _parent.displayFilesLoaded.push({id:files[0].id, file:files[0].file});
                 this.loadFiles(files);
             }
 
+        };
+
+        /**
+         * Compare loaded files against waiting files, then place into load queue.
+         * @param files
+         * @returns {Array}
+         */
+        Initialize.prototype.checkFilesToLoad = function (files) {
+
+            var wait;
+
+
+            for (var i=0; i<_parent.filesToLoad.length; i++) {
+
+                wait = false;
+
+                for (var k=0; k<_parent.filesToLoad[i].wait.length; k++) {
+
+                    //var test1 = _parent.filesToLoad[i].wait[k],
+                    //    test2 = _parent.filesLoaded;
+
+                    //console.log(test1);
+                    //console.log(test2);
+
+                    if (!(_parent.filesToLoad[i].wait[k] in _parent.filesLoaded)) {
+                        wait = true;
+                        break;
+
+                    } else {
+
+                        _parent.filesToLoad[i].wait.splice(k,1);
+                    }
+                }
+
+                if (!wait) {
+                    _parent.filesToLoad[i].wait = null;
+                    files.push(_parent.filesToLoad[i]);
+                    _parent.filesToLoad.splice(i, 1);
+                }
+            }
+
+            return files;
         };
 
         /**
@@ -229,26 +295,38 @@
         Initialize.prototype.processEvent = function (domContext, type, files) {
 
             var file        = files.shift(),
-                isError     = (type && (type.type === 'error' || type.type === 'timeout')),
-                callback    = (isError) ? file.error : file.success;
+                isError     = (type && (type.type === 'error' || type.type === 'timeout' || type.type === 'waiting')),
+                callback    = (isError) ? file.error : file.success,
+                returnData  = [type.type];
 
-            if (domContext.parentNode && file.type === 'js') {
+            if (domContext && domContext.parentNode && file.type === 'js') {
 
                 domContext.parentNode.removeChild(domContext);
             }
 
+            //console.log('1.'+(file.file||'no file'));
+            //console.log(_parent.filesToLoad.slice(0));
+
+            files = this.checkFilesToLoad(files);
+
             if (callback) {
 
-                callback.call(domContext, type.type, file.file);
+                callback.apply(domContext, returnData.push(file.file));
             }
 
             if (isError && this.exposeContext.error.active) {
 
-                this.exposeContext.error.call(this.exposeContext, type.type);
+                if (type.type === 'waiting') {
+                    returnData.push(_parent.filesToLoad.slice(0));
+                }
+
+                this.exposeContext.error.apply(this.exposeContext, returnData);
                 return;
             }
 
-            if (files.length || _parent.filesToLoad.length && !files.length) {
+            //if (files.length || _parent.filesToLoad.length && !files.length) {
+            //if (files.length || _parent.filesToLoad.length) {
+            if (files.length) {
 
                 this.checkQueue(files);
 
@@ -256,10 +334,33 @@
 
                 if (this.exposeContext.success.active) {
 
-                    this.exposeContext.success.call(this.exposeContext, type.type);
+                    this.exposeContext.success.apply(this.exposeContext, returnData);
                 }
             }
         };
+
+        /**
+         * Convert arguments into an array.
+         * @returns {Array}
+         */
+        function convertArguments () {
+
+            var args        = Array.prototype.slice.call(arguments),
+                returnArray = [];
+
+            while (args.length) {
+
+                var temp = args.shift();
+
+                if ( Object.prototype.toString.call(temp) === "[object Array]" ) {
+                    returnArray = returnArray.concat(temp);
+                } else if (temp) {
+                    returnArray.push(temp);
+                }
+            }
+
+            return returnArray;
+        }
 
         /**
          * Exposed methods.
@@ -289,6 +390,13 @@
                     error.apply(this, arguments);
                 };
                 this.error.active = true;
+                return this;
+            },
+
+            wait: function () {
+                //_parent.data.wait = convertArguments.apply(this, arguments);
+                setData('wait', convertArguments.apply(this, arguments));
+                //_parent.wait = this.wait.args = convertArguments.apply(this, arguments);
                 return this;
             }
         };
