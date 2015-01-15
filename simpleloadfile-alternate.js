@@ -56,7 +56,8 @@
          */
         function Initialize (context, files) {
 
-            this.exposeContext = context;
+            //this.exposeContext = context;
+            setData('exposeContext', context);
             this.setup(files);
         }
 
@@ -294,10 +295,11 @@
          */
         Initialize.prototype.processEvent = function (domContext, type, files) {
 
-            var file        = files.shift(),
-                isError     = (type && (type.type === 'error' || type.type === 'timeout' || type.type === 'waiting')),
-                callback    = (isError) ? file.error : file.success,
-                returnData  = [type.type];
+            var file            = files.shift(),
+                isError         = (type && (type.type === 'error' || type.type === 'timeout' || type.type === 'waiting')),
+                callback        = (isError) ? file.error : file.success,
+                returnData      = [type.type],
+                exposeContext   = getData('exposeContext');
 
             if (domContext && domContext.parentNode && file.type === 'js') {
 
@@ -314,13 +316,14 @@
                 callback.apply(domContext, returnData.push(file.file));
             }
 
-            if (isError && this.exposeContext.error.active) {
+            //if (isError && this.exposeContext.error.active) {
+            if (isError && getData('errorActive')) {
 
                 if (type.type === 'waiting') {
                     returnData.push(_parent.filesToLoad.slice(0));
                 }
 
-                this.exposeContext.error.apply(this.exposeContext, returnData);
+                exposeContext.error.apply(exposeContext, returnData);
                 return;
             }
 
@@ -332,9 +335,10 @@
 
             } else {
 
-                if (this.exposeContext.success.active) {
+                //if (this.exposeContext.success.active) {
+                if (getData('successActive')) {
 
-                    this.exposeContext.success.apply(this.exposeContext, returnData);
+                    exposeContext.success.apply(exposeContext, returnData);
                 }
             }
         };
@@ -380,7 +384,8 @@
                 this.success = function () {
                     success.apply(this, arguments);
                 };
-                this.success.active = true;
+                //this.success.active = true;
+                setData('successActive', true);
                 return this;
             },
 
@@ -389,7 +394,8 @@
                 this.error = function () {
                     error.apply(this, arguments);
                 };
-                this.error.active = true;
+                //this.error.active = true;
+                setData('errorActive', true);
                 return this;
             },
 
