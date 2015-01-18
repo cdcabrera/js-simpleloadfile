@@ -69,8 +69,8 @@ resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
 
 ###Known Issues
 
-In testing IE8 there appeared a 5% failure rate on a battery of rapid refresh test loading. However, other
-factors could have played a role, as the failure appeared inconsistently.
+In testing IE8 there appeared a 5% failure rate on a battery of rapid refresh test loads. However, other
+factors could have played a role since the failure appeared inconsistently.
 
 The technique used to determine whether IE8 is firing an error or a load event for JS files is based on local and
 cross domain locations. Where "load" is fired on local files and "complete" is fired on cross domain files. Whether
