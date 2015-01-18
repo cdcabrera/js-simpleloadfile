@@ -224,7 +224,7 @@
                         // in testing... local files fire 'loaded', alt domain files fire 'completed'
                         if (file.type === 'js') {
 
-                            if (/loaded/.test(this.readyState) && !/^http/.test(file.file) || /complete/.test(this.readyState) && /^http/.test(file.file)) {
+                            if (/loaded/.test(this.readyState) && !/^(http|\/\/)/.test(file.file) || /complete/.test(this.readyState) && /^(http|\/\/)/.test(file.file)) {
 
                                 emulatedType.type = 'load';
                             } else {
