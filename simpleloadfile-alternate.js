@@ -8,11 +8,9 @@
      */
     window.resourceLoad = function () {
 
-        var _parent     = this.resourceLoader,
+        var _parent     = this,
             _settings   = { timeout:10000, files:convertArguments.apply(null, arguments)},
             _id;
-
-
 
         resetObjData();
 
@@ -24,12 +22,9 @@
          */
         function Expose (files) {
 
-            //var self = this;
-
             this.files = _parent.displayFilesLoaded;
 
             setTimeout(function(){
-                //new Initialize(self, files);
                 new Initialize(files);
             },0);
 
@@ -38,21 +33,11 @@
 
         /**
          * Internally initialize, separate context.
-         * @param context
          * @param files
          * @constructor
          */
-        //function Initialize (context, files) {
         function Initialize (files) {
 
-            //this.resetObjData();
-            //console.log(this);
-            //console.log(_parent.prototype);
-            //this.exposeContext = context;
-            //setObjData('exposeContext', context);
-            //return;
-            //setObjData('other', window.document.scripts.length);
-            //setObjData('scripts', window.document.scripts.length);
             setObjData('scripts', 0);
 
             this.setup(files);
@@ -85,31 +70,27 @@
                 tempObj.timeout = (file.timeout) ? file.timeout : timeout;
 
                 if (!tempObj.id) {
+
                     tempObj.id = tempObj.file;
                 }
 
                 if (tempObj.wait) {
+
                     tempObj.wait = convertArguments(tempObj.wait);
                 }
 
-                /*try {
-                 console.log(dataWait+'');
-                 console.log(tempObj.file);
-
-                 } catch (e) {
-
-                 debugger;
-                 }*/
-
                 if ( dataWait ) {
+
                     tempObj.wait = convertArguments(dataWait, tempObj.wait);
                 }
 
                 if (tempObj.wait && tempObj.wait.length) {
+
                     tempObj.defer = true;
                 }
 
                 if (!tempObj.cache) {
+
                     tempObj.file += '{0}resourceLoad={1}'.replace('{0}', ((/\?.*\=/).test(tempObj.file) ? '&' : '?')).replace('{1}', (1e5 * Math.random()));
                 }
 
@@ -138,7 +119,6 @@
 
             files = this.checkFilesToLoad(files);
 
-            //alert((files[0]||{file:null}).file+'\n'+(getObjData('error')||'').toString());
 
             if (!files.length) {
 
@@ -158,7 +138,6 @@
                 _parent.displayFilesLoaded.push({id:files[0].id, file:files[0].file});
                 this.loadFiles(files);
             }
-
         };
 
         /**
@@ -212,6 +191,7 @@
                 fallback    = false;
 
             if (file.defer) {
+
                 element.defer = true;
             }
 
@@ -226,12 +206,6 @@
                     element.href = file.file;
                     break;
             }
-
-            if (file.type === 'js') {
-                //setObjData('scripts', window.document.scripts.length);
-                setObjData('scripts', (getObjData('scripts') + 1));
-            }
-
 
             if ('hasOwnProperty' in element && 'onload' in element) {
 
@@ -249,91 +223,10 @@
                 };
 
             } else if (element.readyState) {
-                var bob = file.file;
-                /*
-                 var testo = document.createElement('link');
-                 testo.onreadystatechange = function(a,b,c){
 
-                 var readystateself = this.readyState;
-                 var testself = this;
-                 var testfile = file.file;
-                 debugger;
-                 selfContext.processEvent(this, {type: 'contextfail'}, files);
-                 };
-                 testo.href = file.file;
-
-                 document.getElementsByTagName('HEAD')[0].appendChild(testo);
-                 document.getElementsByTagName('HEAD')[0].removeChild(testo);
-                 */
-
-                //var testo = new Image();
-                /*element.attachEvent('onreadystatechange', function() {
-
-                 var readystateself = this.readyState;
-                 var testself = this;
-                 var testfile = file.file;
-                 debugger;
-                 selfContext.processEvent(this, {type: 'contextfail'}, files);
-                 });*/
-                /*testo.onerror = function(a,b,c) {
-
-                 var readystateself = this.readyState;
-                 var testself = this;
-                 var testfile = file.file;
-                 debugger;
-
-                 selfContext.processEvent(this, {type: 'contextfail'}, files);
-                 };*/
-                //testo.src = file.file;
-
-                //window.document.attachEvent('onreadystatechange', function() {
-                /*window.document.onerror = function(){
-
-                 var readystateself = this.readyState;
-                 var testself = this;
-                 var testfile = file.file;
-                 debugger;
-
-                 };*/
-
-                //element.onpropertychange = function(a,b,c) {
-                //var self = this;
-                //var file = file.file;
-                //debugger;
-                //};
-                //var test = new Image();
-                //element = document.createElement('img');
-
-                //var doimage = document.createElement('span');
-                //document.getElementsByTagName('BODY')[0].appendChild(doimage);
-
-                //doimage.innerHTML = '<img src="http://www.bcbsnc.com/assets/global/js/libs/angular/1.2.0/angular.min.js" onreadystatechange="woot.call(this);" onerror="doit.call(this);">';
-
-                //element.attachEvent('onreadystate', function() {
                 element.onload = element.onreadystatechange = function (type) {
-                    //element.onload = element.ondataavailable = function (type) {
-                    //element.onerrorupdate = element.onactivate = function (type) {
-                    var elementsrc = element.src;
-                    var bobsrc = bob;
-                    var filesrc = file.file;
-                    var self = this;
-                    var srcie = this.getAttribute('src');
-                    var src = this.src;
-                    //var file = file.file;
-                    var read = this.readyState;
-                    var testo = this.ie8_attributes;
-                    //var test2 = testo.item();
-                    //this.onpropertychange = null;
 
-                    var complete1 = (!(this.readyState));
-                    var complete2 = (/loaded/.test(this.readyState) && !/^http/.test(srcie));
-                    var complete3 = (/complete/.test(this.readyState) && /^http/.test(srcie));
-
-
-
-                    //if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
                     if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
-
 
                         clearTimeout(timeout);
 
@@ -341,48 +234,32 @@
 
                         var passedType = {type: 'contextfail'};
 
-                        //this function () {
-                        //alert('activate='+file.file);
-                        //};
-
-                        //var sc = window.document.scripts;
-
-                        //var testself = this;
-                        //var testfile = file.file;
-                        //debugger;
+                        // for js files a pattern
+                        // in testing... local files fire 'loaded', alt domain files fire 'completed'
                         if (file.type === 'js') {
 
                             if (/loaded/.test(this.readyState) && !/^http/.test(file.file) || /complete/.test(this.readyState) && /^http/.test(file.file)) {
 
-                                passedType.type = 'complete';
+                                passedType.type = 'load';
                             } else {
 
                                 passedType.type = 'error';
+                                /*
+                                 try {
+                                 throw new Error('NetworkError: 404 Not Found - '+file.file);
+                                 } catch (e) {
+
+                                 if (console) {
+
+                                 console.log(e.message);
+                                 }
+                                 }*/
                             }
                         }
 
-
-                        //debugger;
-
                         selfContext.processEvent(this, passedType, files, true);
-                    } //else {
-
-                    //if (/loaded/.test(this.readyState)) {
-                    //selfContext.processEvent(this, {type: 'error'}, files, true);
-                    //}
-                    //}
-                    //};
+                    }
                 };
-
-                //document.getElementsByTagName('BODY')[0].appendChild(element);
-
-                //test.onerror = function(){
-                //var testo = this;
-                //debugger;
-                //selfContext.processEvent(this, {type: 'error'}, files, true);
-                //};
-
-                //test.src = file.file;
 
             } else {
 
@@ -401,7 +278,7 @@
             }
 
             if (fallback) {
-                alert('fallback');
+
                 selfContext.processEvent(element, {type: 'contextfail'}, files);
             }
         };
@@ -411,80 +288,30 @@
          * @param domContext
          * @param type
          * @param files
-         * @param checkLength
+         * @param ie
          */
-        Initialize.prototype.processEvent = function (domContext, type, files, checkLength) {
+        Initialize.prototype.processEvent = function (domContext, type, files, ie) {
 
             var file            = files.shift(),
-                //isError         = (type && (type.type === 'error' || type.type === 'timeout' || type.type === 'waiting')),
                 isError         = (type && (type.type === 'error' || type.type === 'timeout')),
                 callback        = (isError) ? file.error : file.success,
                 returnData      = [type.type, (file.file||null), (_parent.filesToLoad.slice(0)||null)],
                 globalError     = getObjData('error'),
                 globalSuccess   = getObjData('success'),
-                globalScripts   = getObjData('scripts'),
-                globalOther     = getObjData('other'),
                 globalUpdate    = (_parent.update && _parent.update.length)? _parent.update : null;
-            //globalUpdate    = (_parent.update && _parent.update.callbacks.length)? _parent.update : null;//getObjData('update');
 
-            //exposeContext   = getObjData('exposeContext'),
-            //exposeContextErr= getObjData('exposeContextError');
-            if(type.type !== 'waiting' && file.type === 'js') {
-                //setObjData('other', (getObjData('other') + 1));
+            // might be an issue with removing the script and older IE
+            if (domContext && domContext.parentNode && file.type === 'js' && !ie) {
 
-                var one = window.document.scripts.length,
-                    two = globalScripts,
-                    three = getObjData('other'),
-                    four = window,
-                    five = window.document,
-                    six = file.file,
-                    seven = domContext.readyState,
-                    eight = domContext;
-
-                //debugger;
+                domContext.parentNode.removeChild(domContext);
             }
-
-            if (checkLength && type.type !== 'waiting' && two < one ) {
-                //isError = true;
-                //callback = file.error;
-                //returnData[0] = 'error';
-            }
-
-            if (domContext && domContext.parentNode && file.type === 'js') {
-
-                if(type.type !== 'waiting'){
-                    setObjData('other', window.document.scripts.length);
-
-                }
-
-
-                //domContext.parentNode.removeChild(domContext);
-            }
-
-
 
             files = this.checkFilesToLoad(files);
 
             if (callback) {
 
-                //returnData.push(file.file);
                 callback.apply(domContext, returnData);
             }
-
-            //if (globalUpdate && globalUpdate.callback) {
-            /*if (globalUpdate) {
-
-             if (type.type === 'waiting') {
-
-             returnData.push(_parent.filesToLoad.slice(0));
-             }
-
-             //globalUpdate.callback.apply(globalUpdate.context, returnData);
-
-             while (globalUpdate.callbacks.length) {
-             globalUpdate.callbacks.shift().apply(globalUpdate.context, returnData);
-             }
-             }*/
 
             if (globalUpdate) {
 
@@ -494,47 +321,20 @@
                 }
             }
 
-            //console.log(_parent.update.slice(0));
-            //console.log(returnData);
-
             if (type.type === 'waiting') {
 
                 return;
             }
 
-            //if (isError && getObjData('errorActive')) {
-            //if (isError && getObjData('error')) {
-            //console.log('test = '+getObjData('error'));
-            //console.log(globalError);
-            var testtype = type.type;
-            debugger;
-
             if (isError) {
-
 
                 if (globalError) {
 
                     globalError.apply(_parent, returnData);
                 }
 
-                //if (globalError && globalError.callback) {
-
-                //globalError.callback.apply(globalError.context, returnData);
-                //}
-
                 return;
             }
-
-            //this.exposeContext.error.apply(this.exposeContext, returnData);
-
-            //if (exposeContext) {
-
-            //exposeContext.error.apply(exposeContext, returnData);
-            //}
-
-
-            //   return;
-            // }
 
             if (files.length) {
 
@@ -542,14 +342,9 @@
 
             } else {
 
-                //if (getObjData('successActive')) {
-                //if (globalSuccess && globalSuccess.callback) {
                 if (globalSuccess) {
 
                     globalSuccess.apply(globalSuccess, returnData);
-                    //globalSuccess.callback.apply(globalSuccess.context, returnData);
-                    //this.exposeContext.success.apply(this.exposeContext, returnData);
-                    //exposeContext.success.apply(exposeContext, returnData);
                 }
             }
         };
@@ -561,8 +356,14 @@
          */
         function getObjData (key) {
 
-            //return (_parent.__data__[_id] && _parent.__data__[_id][key] || null);
-            return (_parent.__data__[_id] && _parent.__data__[_id][key])? _parent.__data__[_id][key] : null;
+            var data = null;
+
+            if (_parent.__data__[_id] && _parent.__data__[_id][key]) {
+
+                data = _parent.__data__[_id][key]
+            }
+
+            return data;
         }
 
         /**
@@ -610,7 +411,7 @@
 
         /**
          * Exposed methods.
-         * @type {{complete: Function, success: Function, error: Function}}
+         * @type {{update: Function, complete: Function, success: Function, error: Function, wait: Function}}
          */
         Expose.prototype = {
 
@@ -622,7 +423,6 @@
                 }
 
                 _parent.update.push(callback);
-                //_parent.update.push(function(){ callback.apply(this, arguments); });
                 return this;
             },
 
@@ -635,26 +435,12 @@
 
             success: function (success) {
 
-                //this.success = function () {
-                //    success.apply(this, arguments);
-                //};
-
-                //setObjData('successActive', true);
-                //var self = this;
-                //setObjData('successActive', {callback:success, context:self});
                 setObjData('success', success);
                 return this;
             },
 
             error: function (error) {
-                //console.log(error);
-                //this.error = function () {
-                //    error.apply(this, arguments);
-                //};
 
-                //setObjData('errorActive', true);
-                //var self = this;
-                //setObjData('errorActive', {callback:error, context:self});
                 setObjData('error', error);
                 return this;
             },
@@ -665,9 +451,6 @@
                 return this;
             }
         };
-
-        //_parent.__data__ = {};
-        //_parent.__data__[_id] = {};
 
         return new Expose(_settings.files);
     };
