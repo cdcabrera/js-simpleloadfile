@@ -14,22 +14,10 @@
 
         resetObjData();
 
-        /**
-         * Expose methods and property.
-         * @param files
-         * @returns {Expose}
-         * @constructor
-         */
-        function Expose (files) {
+        setTimeout(function(){
 
-            this.files = _parent.displayFilesLoaded;
-
-            setTimeout(function(){
-                new Initialize(files);
-            },0);
-
-            return this;
-        }
+            new Initialize(_settings.files);
+        },0);
 
         /**
          * Internally initialize, separate context.
@@ -37,8 +25,6 @@
          * @constructor
          */
         function Initialize (files) {
-
-            setObjData('scripts', 0);
 
             this.setup(files);
         }
@@ -232,7 +218,7 @@
 
                         this.onload = this.onreadystatechange = null;
 
-                        var passedType = {type: 'contextfail'};
+                        var emulatedType = {type: 'contextfail'};
 
                         // for js files a pattern
                         // in testing... local files fire 'loaded', alt domain files fire 'completed'
@@ -240,10 +226,10 @@
 
                             if (/loaded/.test(this.readyState) && !/^http/.test(file.file) || /complete/.test(this.readyState) && /^http/.test(file.file)) {
 
-                                passedType.type = 'load';
+                                emulatedType.type = 'load';
                             } else {
 
-                                passedType.type = 'error';
+                                emulatedType.type = 'error';
                                 /*
                                  try {
                                  throw new Error('NetworkError: 404 Not Found - '+file.file);
@@ -256,8 +242,7 @@
                                  }*/
                             }
                         }
-
-                        selfContext.processEvent(this, passedType, files, true);
+                        selfContext.processEvent(this, emulatedType, files, true);
                     }
                 };
 
@@ -339,7 +324,6 @@
             if (files.length) {
 
                 this.checkQueue(files);
-
             } else {
 
                 if (globalSuccess) {
@@ -400,8 +384,10 @@
                 var temp = args.shift();
 
                 if ( Object.prototype.toString.call(temp) === "[object Array]" ) {
+
                     returnArray = returnArray.concat(temp);
                 } else if (temp) {
+
                     returnArray.push(temp);
                 }
             }
@@ -411,9 +397,11 @@
 
         /**
          * Exposed methods.
-         * @type {{update: Function, complete: Function, success: Function, error: Function, wait: Function}}
+         * @type {{files: Array, update: Function, complete: Function, success: Function, error: Function, wait: Function}}
          */
-        Expose.prototype = {
+        return {
+
+            files: _parent.displayFilesLoaded,
 
             update: function (callback) {
 
@@ -451,8 +439,6 @@
                 return this;
             }
         };
-
-        return new Expose(_settings.files);
     };
 
 })(this);
