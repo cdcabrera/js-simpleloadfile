@@ -202,7 +202,7 @@
                 timeout     = setTimeout(function () { element.onload({type: 'timeout'}); }, file.timeout),
                 fallback    = false;
 
-            if (file.defer) {
+            if (file.defer && file.type === 'js') {
 
                 element.defer = true;
             }
