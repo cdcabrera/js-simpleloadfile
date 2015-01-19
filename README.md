@@ -70,10 +70,11 @@ resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
 
 ###Known Issues
 
-Because of load times from other domains a slight rearrangement of load order can occur, especially if a
-combination of CSS and JS files is used. Continuing to look for a patch on this one...
+Using a combination of CSS and JS files within the same resource loader appears to cause a slight
+rearrangement of load order. In testing it appears that the CSS files are the ones out of order.
+Continuing to look for a patch on this one...
 
-In testing IE8 there appeared a 5% failure rate on a battery of rapid refresh test loads. However, other
+In testing IE8 there appeared a 5% failure rate on a battery of rapid reloads. However, other
 factors could have played a role since the failure appeared inconsistently.
 
 
