@@ -202,7 +202,7 @@
                 timeout     = setTimeout(function () { element.onload({type: 'timeout'}); }, file.timeout),
                 fallback    = false;
 
-            if (file.defer) {
+            if (file.defer && file.type === 'js') {
 
                 element.defer = true;
             }
@@ -247,7 +247,7 @@
 
                         this.onload = this.onreadystatechange = null;
 
-                        var emulatedType = {type: 'contextfail'};
+                        var emulatedType = (type && type.type)? type : {type: 'contextfail'};
 
                         if (file.type === 'js') {
 
