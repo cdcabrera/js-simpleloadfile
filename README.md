@@ -82,7 +82,7 @@ factors could have played a role since the failure appeared inconsistently.
 Works in Firefox, Chrome, Opera, Safari, and IE 8+.
 
 IE8 doesn't play well with events on script and link tags. For JS files IE8 returns 3 event types with this
-plugin: "contextfail", "error", and "timeout". The "error" event is a workaround based on a window.event
+plugin: "load", "error", and "timeout". The "error" event is a workaround based on a window.event
 handler that runs parallel to the "onreadystatechange" event.
 
 Other unsupported/untested/older browsers have the potential to simply receive a loaded script and "contextfail"
