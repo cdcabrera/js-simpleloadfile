@@ -213,14 +213,14 @@
 
             element.id = id;
 
-            if (file.defer && file.type === 'js') {
-
-                element.defer = true;
-            }
-
             switch (file.type) {
                 case 'js':
-                    element.async = true;
+
+                    if (!file.defer) {
+
+                        element.async = true;
+                    }
+
                     element.src = file.file;
                     break;
 
