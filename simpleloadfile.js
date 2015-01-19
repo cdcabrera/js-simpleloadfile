@@ -236,6 +236,9 @@
 
             } else if (element.readyState) {
 
+                // sets a window.onerror event once. attempts to rewrite the event in the case of an override.
+                setWindowError();
+
                 element.onload = element.onreadystatechange = function (type) {
 
                     if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
@@ -246,28 +249,40 @@
 
                         var emulatedType = {type: 'contextfail'};
 
-                        // for js files a pattern
-                        // in testing... local files fire 'loaded', alt domain files fire 'completed'
                         if (file.type === 'js') {
 
-                            if (/loaded/.test(this.readyState) && !/^http/.test(file.file) || /complete/.test(this.readyState) && /^http/.test(file.file)) {
+                            var winError = getObjData('winError');
 
-                                emulatedType.type = 'load';
-                            } else {
+                            // IE8 script debugger appears to deactivate window.onerror, error detection fails.
+                            debugger;
+
+                            if (winError && winError.file === this.src) {
 
                                 emulatedType.type = 'error';
-                                /*
-                                 try {
-                                 throw new Error('NetworkError: 404 Not Found - '+file.file);
-                                 } catch (e) {
-
-                                 if (console) {
-
-                                 console.log(e.message);
-                                 }
-                                 }*/
                             }
                         }
+
+                        // for js files a pattern
+                        // CORRECTION in testing... this only applies to "cached" files
+                        // local files fire 'loaded', alt domain files fire 'completed'
+                        /*if (file.type === 'js') {
+
+                         if (/loaded/.test(this.readyState) && !/^(http|\/\/)/.test(file.file) || /complete/.test(this.readyState) && /^(http|\/\/)/.test(file.file)) {
+
+                         emulatedType.type = 'load';
+                         } else {
+
+                         emulatedType.type = 'error';
+
+                         //try {
+                         //throw new Error('NetworkError: 404 Not Found - '+file.file);
+                         //} catch (e) {
+                         //if (console) {
+                         //console.log(e.message);
+                         //}
+                         //}
+                         }
+                         }*/
                         selfContext.processEvent(this, emulatedType, files, true);
                     }
                 };
@@ -358,6 +373,28 @@
                 }
             }
         };
+
+        /**
+         * IE8 helper for determining script errors onload.
+         */
+        function setWindowError () {
+
+            if (window.onerror && '__data__' in window.onerror) {
+
+                return;
+            }
+
+            var winEvent = (window.onerror)? window.onerror : function(){};
+
+            window.onerror = function (message, file, line) {
+
+                setObjData('winError', {message:message, file:file, line:line});
+                winEvent.apply(this, arguments);
+            };
+
+            // an attempt to detect if onerror was overwritten
+            window.onerror.__data__ = true;
+        }
 
         /**
          * Get initialized data.
