@@ -247,7 +247,7 @@
 
                         this.onload = this.onreadystatechange = null;
 
-                        var emulatedType = {type: 'contextfail'};
+                        var emulatedType = (type && type.type)? type : {type: 'contextfail'};
 
                         if (file.type === 'js') {
 
