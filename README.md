@@ -35,9 +35,13 @@ resourceLoad({
 ```
 
 
-Going crazy... creating 2 instances of resource load, the second with a "wait"
+Going crazy... creating 2 instances of resource load, the first with a "wait" for another
+resource loader that fires the ID "jQuery".
 
 ```javascript
+
+resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
+        .wait('jQuery');
 
 var resources = [
     '//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css',
@@ -62,9 +66,6 @@ resourceLoad(resources)
             console.log(arguments);
         });
 
-
-resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
-        .wait('jQuery');
 ```
 
 
@@ -86,8 +87,9 @@ IE8 doesn't play well with events on script and link tags. For JS files IE8 retu
 plugin: "load", "error", and "timeout". The "error" event is a workaround based on a window.event
 handler that runs parallel to the "onreadystatechange" event.
 
-Other unsupported/untested/older browsers have the potential to simply receive a loaded script and "contextfail"
-message within callback parameters.
+The original loader supported IE7, this time around I bypassed that testing. IE7 and other unsupported/untested/older
+browsers may work correctly with the incorporated fallback, but they also have the potential to simply receive a
+loaded file and "contextfail" message within callback parameters.
 
 
 
