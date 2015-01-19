@@ -1,10 +1,11 @@
-#JS.Simple Load File or ResourceLoad
+#JS.Simple Load File or Resource Load
 
 A resource loader for JS and CSS files.
 
 ##The NEW...
 
-Updated to provide a group of chained methods, and a loaded property. This includes a success, error, and a wait que.
+Updated to provide a group of chained methods, and a loaded property. This includes a success, error, a
+global update, and a wait que.
 
 
 
@@ -72,15 +73,17 @@ resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
 In testing IE8 there appeared a 5% failure rate on a battery of rapid refresh test loads. However, other
 factors could have played a role since the failure appeared inconsistently.
 
-The technique used to determine whether IE8 is firing an error or a load event for JS files is based on local and
-cross domain locations. Where "load" is fired on local files and "complete" is fired on cross domain files. Whether
-this is consistent remains to be seen, but this is still a potential failure point.
-
 
 ###Browser Compatibility
 
-Works in Firefox, Chrome, Opera, Safari, and IE 8+. On certain aspects IE 8 and other unsupported/older browsers
-simply receive a globally loaded script and "contextfail" message within callback parameters.
+Works in Firefox, Chrome, Opera, Safari, and IE 8+.
+
+IE8 doesn't play well with events on script and link tags. For JS files IE8 returns 3 event types with this
+plugin: "contextfail", "error", and "timeout". The "error" event is a workaround based on a window.event
+handler that runs parallel to the "onreadystatechange" event.
+
+Other unsupported/untested/older browsers have the potential to simply receive a loaded script and "contextfail"
+message within callback parameters.
 
 
 
@@ -92,7 +95,7 @@ simply receive a globally loaded script and "contextfail" message within callbac
 An experimental bit of JS to load scripts in a scoped manner. Included a simple CSS file loading method as well.
 
 
-###How it worked
+###Original, How it Worked
 
 This API independent method uses the appended script element to the document header process. As pretty much all front-end
 developers know this enables you to load a JS file cross domain.
@@ -107,7 +110,7 @@ script loading the aforementioned concern isn't really one because of the built 
 the method provides, maybe.
 
 
-###Known Issues
+###Original, Known Issues
 
 The only issue that's popped up has to do with setting a breakpoint/debugger call in Firebug, within the callbacks, for
 dynamically loaded CSS files in versions of Firefox that support "onload" and "onerror" when applied to link elements.
@@ -115,7 +118,7 @@ I did fix/bypass the problem and it could have been entirely on Firebug in this 
 
 
 
-###Browser Compatibility
+###Original, Browser Compatibility
 
 Works in Firefox, Chrome, Opera, Safari, and IE 9+. IE 7-8 and other unsupported/older browsers simply receive a globally
 loaded script and "contextfail" message in the callbacks.
