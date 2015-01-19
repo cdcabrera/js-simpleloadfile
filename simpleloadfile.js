@@ -443,7 +443,7 @@
         }
 
         /**
-         * Exposed methods.
+         * Exposed methods & property.
          * @type {{files: Array, update: Function, complete: Function, success: Function, error: Function, wait: Function}}
          */
         return {
