@@ -1,13 +1,16 @@
 /*
  * SimpleLoadFile/ResourceLoad Method
  * Copyright 2014, CDCabrera, menotyou.com
- * licensed under MIT license, http://opensource.org/licenses/mit-license.php
+ * licensed under MIT license, http://en.wikipedia.org/wiki/MIT_License
  *
  * Aspects of the event creation were utilized from jQuery's ajaxTransport
  * jQuery is licensed under the MIT license, http://en.wikipedia.org/wiki/MIT_License
  *
  * The main aspect of the IE8 css event.type is pulled from Pete Otaqui's
  * Gist on CSS File Loading, https://gist.github.com/pete-otaqui/3912307
+ *
+ * Similar concept, and method name in the returned "wait" as LABjs.
+ * LABjs is licensed under the MIT license, http://en.wikipedia.org/wiki/MIT_License
  */
 /*
  settings in the form of any array of objects, string or object arguments.
@@ -33,7 +36,7 @@
 
     /**
      * Load JS and CSS files.
-     * @returns {Expose}
+     * @returns {{files: Array, update: Function, complete: Function, success: Function, error: Function, wait: Function}}
      */
     window.resourceLoad = function () {
 

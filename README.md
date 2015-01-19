@@ -139,3 +139,7 @@ licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
 Utilized an aspect of [Pete Otaqui's](https://github.com/pete-otaqui) [Gist on CSS File Loading](https://gist.github.com/pete-otaqui/3912307)
 to apply event types for CSS loads in IE8.
+
+It happened that I used a similar concept, and method name when utilizing "wait" as
+[LABjs](https://github.com/getify/LABjs). LABjs is licensed under the
+[MIT License](http://en.wikipedia.org/wiki/MIT_License).
