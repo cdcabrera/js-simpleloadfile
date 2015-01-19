@@ -75,11 +75,16 @@
                 tempObj.id      = (file.id) ? file.id : null;
                 tempObj.wait    = (file.wait) ? file.wait : null;
                 tempObj.cache   = (file.cache === undefined || file.cache) ? true : false;
-                tempObj.file    = (typeof file.file === 'string') ? file.file.replace(/\s+$/, '') : '';
+                tempObj.file    = (typeof file.file === 'string') ? file.file.replace(/\s+$/, '') : null;
                 tempObj.type    = (file.type) ? file.type.toLowerCase() : ((/\.js.*$/i).test(file.file)) ? 'js' : 'css';
                 tempObj.success = (file.success) ? file.success : null;
                 tempObj.error   = (file.error) ? file.error : null;
                 tempObj.timeout = (file.timeout) ? file.timeout : timeout;
+
+                if (!tempObj.file) {
+
+                    continue;
+                }
 
                 if (!tempObj.id) {
 
@@ -358,7 +363,7 @@
          */
         function setWindowError () {
 
-            if (window.onerror && '__data__' in window.onerror) {
+            if (window.onerror && window.onerror.__data__) {
 
                 return;
             }
