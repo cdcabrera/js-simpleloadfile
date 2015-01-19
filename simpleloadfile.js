@@ -17,7 +17,7 @@
 
     {
     id:         {string} unique identifier used in conjunction with "wait"
-    wait:       {string|array} a string, or array of strings, that trigger based on the aformentioned string IDs
+    wait:       {string|array} a string, or array of strings, that trigger based on the aforementioned string IDs
     cache:      {boolean} cache the file or not
     file:       {string} the file path/URL to load
     type:       {string} string in the form of "css" or "js". if left off it'll simply look for file extensions, not the most reliable method
