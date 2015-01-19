@@ -70,6 +70,9 @@ resourceLoad('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js')
 
 ###Known Issues
 
+Because of load times from other domains a slight rearrangement of load order can occur, especially if a
+combination of CSS and JS files is used. Continuing to look for a patch on this one...
+
 In testing IE8 there appeared a 5% failure rate on a battery of rapid refresh test loads. However, other
 factors could have played a role since the failure appeared inconsistently.
 
@@ -126,9 +129,12 @@ loaded script and "contextfail" message in the callbacks.
 
 ##License
 
-My aspect is released under the <a href="http://en.wikipedia.org/wiki/MIT_License">MIT License</a>.
+My aspect is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
 I did reference aspects of the jQuery 1.8 API ajaxTransport "cross domain" method for handling script
 loading. However, alterations were made based on the way IE loves to fire readystate and onload.
 jQuery is copyrighted Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors. And jQuery is
-licensed under the <a href="http://en.wikipedia.org/wiki/MIT_License">MIT License</a>.
+licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
+
+Utilized an aspect of [Pete Otaqui's](https://github.com/pete-otaqui) [Gist on CSS File Loading](https://gist.github.com/pete-otaqui/3912307)
+to apply event types for CSS loads in IE8.

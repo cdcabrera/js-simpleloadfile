@@ -5,6 +5,9 @@
  *
  * Aspects of the event creation were utilized from jQuery's ajaxTransport
  * jQuery is licensed under the MIT license, http://en.wikipedia.org/wiki/MIT_License
+ *
+ * The main aspect of the IE8 css event.type is pulled from Pete Otaqui's
+ * Gist on CSS File Loading, https://gist.github.com/pete-otaqui/3912307
  */
 /*
  settings in the form of any array of objects, string or object arguments.
@@ -202,10 +205,13 @@
 
             var selfContext = this,
                 file        = files[0],
+                id          = file.type+'-'+(1e5 * Math.random()),
                 element     = (file.type === 'js') ? document.createElement('script') : document.createElement('link'),
                 head        = (document.head || document.getElementsByTagName('head')[0] || document.documentElement),
                 timeout     = setTimeout(function () { element.onload({type: 'timeout'}); }, file.timeout),
                 fallback    = false;
+
+            element.id = id;
 
             if (file.defer && file.type === 'js') {
 
@@ -252,18 +258,51 @@
 
                         this.onload = this.onreadystatechange = null;
 
-                        var emulatedType = (type && type.type)? type : {type: 'contextfail'};
+                        var emulatedType    = (type && type.type)? type : {type: 'contextfail'},
+                            winError        = null,
+                            cssLength       = 0,
+                            cssCurrent      = null;
 
-                        if (file.type === 'js') {
+                        if (emulatedType.type === 'contextfail') {
 
-                            var winError = getObjData('winError');
+                            if (file.type === 'js') {
 
-                            // IE8 script debugger appears to deactivate window.onerror, error detection fails.
-                            debugger;
+                                emulatedType.type = 'load';
+                                winError = getObjData('winError');
 
-                            if (winError && winError.file === this.src) {
+                                if (winError && winError.file === this.src) {
+
+                                    emulatedType.type = 'error';
+                                }
+
+                                // IE8 dev tools script debugger appears to deactivate window.onerror, error detection fails.
+                                debugger;
+
+                            } else {
 
                                 emulatedType.type = 'error';
+
+                                //-- https://gist.github.com/pete-otaqui/3912307
+                                cssLength = document.styleSheets.length;
+
+                                try {
+
+                                    while ( cssLength-- ) {
+
+                                        cssCurrent = document.styleSheets[cssLength];
+
+                                        if ( cssCurrent.id === id ) {
+
+                                            if (cssCurrent.cssText !== '') {
+
+                                                emulatedType.type = 'load';
+                                            }
+
+                                            break;
+                                        }
+                                    }
+
+                                } catch (e) {}
                             }
                         }
 
