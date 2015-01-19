@@ -7,10 +7,10 @@
  * jQuery is licensed under the MIT license, http://en.wikipedia.org/wiki/MIT_License
  */
 /*
- settings in the form of any array of objects, string arguments, or object arguments.
+ settings in the form of any array of objects, string or object arguments.
  1. if you decide to use string(s) just enter the file path/URL
 
- 2. if you decide to use objects the format is:
+ 2. if you decide to use objects the following options are available, all are optional except for "file":
 
     {
     id:         {string} unique identifier used in conjunction with "wait"
@@ -262,27 +262,6 @@
                             }
                         }
 
-                        // for js files a pattern
-                        // CORRECTION in testing... this only applies to "cached" files
-                        // local files fire 'loaded', alt domain files fire 'completed'
-                        /*if (file.type === 'js') {
-
-                         if (/loaded/.test(this.readyState) && !/^(http|\/\/)/.test(file.file) || /complete/.test(this.readyState) && /^(http|\/\/)/.test(file.file)) {
-
-                         emulatedType.type = 'load';
-                         } else {
-
-                         emulatedType.type = 'error';
-
-                         //try {
-                         //throw new Error('NetworkError: 404 Not Found - '+file.file);
-                         //} catch (e) {
-                         //if (console) {
-                         //console.log(e.message);
-                         //}
-                         //}
-                         }
-                         }*/
                         selfContext.processEvent(this, emulatedType, files, true);
                     }
                 };
@@ -375,7 +354,7 @@
         };
 
         /**
-         * IE8 helper for determining script errors onload.
+         * IE8 helper for determining script errors "onload".
          */
         function setWindowError () {
 
