@@ -88,10 +88,25 @@ plugin: "load", "error", and "timeout". The "error" event is a workaround based 
 handler that runs parallel to the "onreadystatechange" event.
 
 The original loader supported IE7, this time around I bypassed that testing. IE7 and other unsupported/untested/older
-browsers may work correctly with the incorporated fallback, but they also have the potential to simply receive a
+browsers may work correctly, but they also have the potential to fire the incorporated fallback and simply receive a
 loaded file and "contextfail" message within callback parameters.
 
 
+###License
+
+My aspect is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
+
+I did reference aspects of the jQuery 1.8 API ajaxTransport "cross domain" method for handling script
+loading. However, alterations were made based on the way IE loves to fire readystate and onload.
+jQuery is copyrighted Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors. And jQuery is
+licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
+
+Utilized an aspect of [Pete Otaqui's](https://github.com/pete-otaqui) [Gist on CSS File Loading](https://gist.github.com/pete-otaqui/3912307)
+to apply event types for CSS loads in IE8.
+
+It happened that I used a similar concept, and method name when utilizing "wait" as
+[LABjs](https://github.com/getify/LABjs). LABjs is licensed under the
+[MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
 
 
@@ -130,7 +145,7 @@ Works in Firefox, Chrome, Opera, Safari, and IE 9+. IE 7-8 and other unsupported
 loaded script and "contextfail" message in the callbacks.
 
 
-##License
+###Original, License
 
 My aspect is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
@@ -138,10 +153,3 @@ I did reference aspects of the jQuery 1.8 API ajaxTransport "cross domain" metho
 loading. However, alterations were made based on the way IE loves to fire readystate and onload.
 jQuery is copyrighted Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors. And jQuery is
 licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
-
-Utilized an aspect of [Pete Otaqui's](https://github.com/pete-otaqui) [Gist on CSS File Loading](https://gist.github.com/pete-otaqui/3912307)
-to apply event types for CSS loads in IE8.
-
-It happened that I used a similar concept, and method name when utilizing "wait" as
-[LABjs](https://github.com/getify/LABjs). LABjs is licensed under the
-[MIT License](http://en.wikipedia.org/wiki/MIT_License).
