@@ -33,12 +33,12 @@
 (function(window, undefined) {
 
     'use strict';
-    
+
     /**
      * Store data for queues.
-     * @type {{filesLoaded: {}, filesFailed: {}, waitQueues: Array}}
+     * @type {{filesLoaded: {}, filesFailed: {}, waitQueues: Array, ieError: null}}
      */
-    var resourceLoaderData = { filesLoaded:{}, filesFailed:{}, waitQueues:[], ieError:null };
+    var resourceLoadData = { filesLoaded:{}, filesFailed:{}, waitQueues:[], ieError:null };
 
     /**
      * Load JS and CSS files.
@@ -47,7 +47,7 @@
     window.resourceLoad = function () {
 
         var _settings = {
-            data:       resourceLoaderData,
+            data:       resourceLoadData,
             id:         (1e5 * Math.random()),
             timeout:    10000,
             files:      convertArguments.apply(null, arguments)
