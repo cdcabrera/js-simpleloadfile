@@ -35,51 +35,60 @@
     'use strict';
 
     /**
+     * Store data for queues.
+     * @type {{filesLoaded: {}, filesFailed: {}, waitQueues: Array, ieError: null}}
+     */
+    var resourceLoadData = { filesLoaded:{}, filesFailed:{}, waitQueues:[], ieError:null };
+
+    /**
      * Load JS and CSS files.
      * @returns {{files: Array, update: Function, complete: Function, success: Function, error: Function, wait: Function}}
      */
     window.resourceLoad = function () {
 
-        var _parent     = this,
-            _settings   = { timeout:10000, files:convertArguments.apply(null, arguments)},
-            _id;
+        var _settings = {
+            data:       resourceLoadData,
+            id:         (1e5 * Math.random()),
+            timeout:    10000,
+            files:      convertArguments.apply(null, arguments)
+        };
 
-        resetObjData();
+        /**
+         * Global instance storage and track loaded files.
+         */
+        _settings.data[_settings.id] = {
+            length:_settings.files.length
+        };
 
+        /**
+         * Rock and or Roll... useless comment.
+         */
         setTimeout(function(){
 
-            new Initialize(_settings.files);
+            setupFiles(_settings.files);
         },0);
 
         /**
-         * Internally initialize, separate context.
-         * @param files
-         * @constructor
+         * Process files into a consistent format, an array of objects.
+         * @param files {Array}
          */
-        function Initialize (files) {
-
-            this.setup(files);
-        }
-
-        /**
-         * Standardize file input(s) for loading.
-         * @param files
-         */
-        Initialize.prototype.setup = function (files) {
+        function setupFiles (files) {
 
             files = (Object.prototype.toString.call(files) == '[object Array]') ? files : [{file: files}];
 
             var setupQueue  = [],
+                globalId    = _settings.id,
                 timeout     = _settings.timeout,
-                dataWait    = getObjData('wait');
+                dataWait    = getObjData(globalId, 'wait');
 
             for (var i = 0; i < files.length; i++) {
 
                 var tempObj = {},
                     file    = ( typeof files[i] === 'string' ) ? {file: files[i]} : files[i];
 
+                tempObj.globalId= globalId;
                 tempObj.id      = (file.id) ? file.id : null;
-                tempObj.wait    = (file.wait) ? file.wait : null;
+                tempObj.wait    = (file.wait) ? file.wait : [];
                 tempObj.cache   = (file.cache === undefined || file.cache) ? true : false;
                 tempObj.file    = (typeof file.file === 'string') ? file.file.replace(/\s+$/, '') : null;
                 tempObj.type    = (file.type) ? file.type.toLowerCase() : ((/\.js.*$/i).test(file.file)) ? 'js' : 'css';
@@ -120,94 +129,43 @@
                 setupQueue.push(tempObj);
             }
 
-            this.checkQueue(setupQueue);
-        };
+            checkQueue(setupQueue);
+        }
 
         /**
-         * Process the "wait" for files by checking against already loaded files.
-         * @param files
+         * Add files to wait queue or continue with loading.
+         * @param files {Array}
          */
-        Initialize.prototype.checkQueue = function (files) {
-
-            if (!_parent.filesLoaded) {
-
-                _parent.filesLoaded = {};
-                _parent.displayFilesLoaded = [];
-            }
-
-            if (!_parent.filesToLoad) {
-
-                _parent.filesToLoad = [];
-            }
-
-            files = this.checkFilesToLoad(files);
-
+        function checkQueue (files) {
 
             if (!files.length) {
 
-                this.processEvent(null, {type: 'waiting'}, [{error:null}]);
                 return;
             }
 
-            if (files[0].wait) {
+            if (files[0].wait.length) {
 
-                _parent.filesToLoad.push(files[0]);
+                setWaitQueue(files[0]);
+
+                processEvent(null, {type: 'waiting'}, [files[0]]);
+
                 files.shift();
-                this.checkQueue(files);
+
+                checkQueue(files);
 
             } else {
 
-                _parent.filesLoaded[files[0].id] = files[0].file;
-                _parent.displayFilesLoaded.push({id:files[0].id, file:files[0].file});
-                this.loadFiles(files);
+                loadFiles(files);
             }
-        };
+        }
 
         /**
-         * Compare loaded files against waiting files, then place into load queue.
-         * @param files
-         * @returns {Array}
+         * Load a file.
+         * @param files {Array}
          */
-        Initialize.prototype.checkFilesToLoad = function (files) {
+        function loadFiles (files) {
 
-            var wait;
-
-            for (var i=0; i<_parent.filesToLoad.length; i++) {
-
-                wait = false;
-
-                for (var k=0; k<_parent.filesToLoad[i].wait.length; k++) {
-
-                    if (!(_parent.filesToLoad[i].wait[k] in _parent.filesLoaded)) {
-
-                        wait = true;
-                        break;
-
-                    } else {
-
-                        _parent.filesToLoad[i].wait.splice(k,1);
-                    }
-                }
-
-                if (!wait) {
-
-                    _parent.filesToLoad[i].wait = null;
-                    files.push(_parent.filesToLoad[i]);
-                    _parent.filesToLoad.splice(i, 1);
-                }
-            }
-
-            return files;
-        };
-
-        /**
-         * Start loading files.
-         * @param files
-         */
-        Initialize.prototype.loadFiles = function (files) {
-
-            var selfContext = this,
-                file        = files[0],
+            var file        = files[0],
                 id          = file.type+'-'+(1e5 * Math.random()),
                 element     = (file.type === 'js') ? document.createElement('script') : document.createElement('link'),
                 head        = (document.head || document.getElementsByTagName('head')[0] || document.documentElement),
@@ -244,74 +202,13 @@
                     var self = this;
 
                     setTimeout(function () {
-                        selfContext.processEvent(self, type, files);
+                        processEvent(self, type, files);
                     }, 0);
                 };
 
             } else if (element.readyState) {
 
-                // sets a window.onerror event once. attempts to rewrite the event in the case of an override.
-                setWindowError();
-
-                element.onload = element.onreadystatechange = function (type) {
-
-                    if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
-
-                        clearTimeout(timeout);
-
-                        this.onload = this.onreadystatechange = null;
-
-                        var emulatedType    = (type && type.type)? type : {type: 'contextfail'},
-                            winError        = null,
-                            cssLength       = 0,
-                            cssCurrent      = null;
-
-                        if (emulatedType.type === 'contextfail') {
-
-                            if (file.type === 'js') {
-
-                                emulatedType.type = 'load';
-                                winError = getObjData('winError');
-
-                                if (winError && winError.file === this.src) {
-
-                                    emulatedType.type = 'error';
-                                }
-
-                                // IE8 dev tools script debugger appears to deactivate window.onerror, error detection fails.
-                                debugger;
-
-                            } else {
-
-                                emulatedType.type = 'error';
-
-                                //-- https://gist.github.com/pete-otaqui/3912307
-                                cssLength = document.styleSheets.length;
-
-                                try {
-
-                                    while ( cssLength-- ) {
-
-                                        cssCurrent = document.styleSheets[cssLength];
-
-                                        if ( cssCurrent.id === id ) {
-
-                                            if (cssCurrent.cssText !== '') {
-
-                                                emulatedType.type = 'load';
-                                            }
-
-                                            break;
-                                        }
-                                    }
-
-                                } catch (e) {}
-                            }
-                        }
-
-                        selfContext.processEvent(this, emulatedType, files, true);
-                    }
-                };
+                setIeEvents(files, file, id, element, timeout);
 
             } else {
 
@@ -320,6 +217,7 @@
             }
 
             switch (file.type) {
+
                 case 'js':
                     head.insertBefore(element, head.firstChild);
                     break;
@@ -331,79 +229,88 @@
 
             if (fallback) {
 
-                selfContext.processEvent(element, {type: 'contextfail'}, files);
+                processEvent(element, {type: 'contextfail'}, files);
             }
-        };
+        }
 
         /**
-         * Process load and error events for a file, then start the process over for the next.
-         * @param domContext
-         * @param type
-         * @param files
-         * @param ie
+         * IE8 load and error event handlers.
+         * @param files {Array}
+         * @param file {Object}
+         * @param id {string}
+         * @param element {*}
+         * @param timeout {*}
          */
-        Initialize.prototype.processEvent = function (domContext, type, files, ie) {
+        function setIeEvents (files, file, id, element, timeout) {
 
-            var file            = files.shift(),
-                isError         = (type && (type.type === 'error' || type.type === 'timeout')),
-                callback        = (isError) ? file.error : file.success,
-                returnData      = [type.type, (file.file||null), (_parent.filesToLoad.slice(0)||null)],
-                globalError     = getObjData('error'),
-                globalSuccess   = getObjData('success'),
-                globalUpdate    = (_parent.update && _parent.update.length)? _parent.update : null;
+            setIeWindowError(file.globalId);
 
-            // might be an issue with removing the script and older IE
-            if (domContext && domContext.parentNode && file.type === 'js' && !ie) {
+            element.onload = element.onreadystatechange = function (type) {
 
-                domContext.parentNode.removeChild(domContext);
-            }
+                if (!(this.readyState) || /loaded|complete/.test(this.readyState)) {
 
-            files = this.checkFilesToLoad(files);
+                    clearTimeout(timeout);
 
-            if (callback) {
+                    this.onload = this.onreadystatechange = null;
 
-                callback.apply(domContext, returnData);
-            }
+                    var emulatedType    = (type && type.type)? type : {type: 'contextfail'},
+                        winError        = null,
+                        cssLength       = 0,
+                        cssCurrent      = null;
 
-            if (globalUpdate) {
+                    if (emulatedType.type === 'contextfail') {
 
-                for (var i=0; i<globalUpdate.length; i++) {
+                        if (file.type === 'js') {
 
-                    globalUpdate[i].apply(_parent, returnData);
+                            emulatedType.type = 'load';
+                            winError = _settings.data.ieError;
+
+                            if (winError && winError.file === this.src) {
+
+                                emulatedType.type = 'error';
+                            }
+
+                            // IE8 dev tools script debugger, when running, appears to deactivate window.onerror, error detection fails.
+                            debugger;
+
+                        } else {
+
+                            emulatedType.type = 'error';
+
+                            //-- https://gist.github.com/pete-otaqui/3912307
+                            cssLength = document.styleSheets.length;
+
+                            try {
+
+                                while ( cssLength-- ) {
+
+                                    cssCurrent = document.styleSheets[cssLength];
+
+                                    if ( cssCurrent.id === id ) {
+
+                                        if (cssCurrent.cssText !== '') {
+
+                                            emulatedType.type = 'load';
+                                        }
+
+                                        break;
+                                    }
+                                }
+
+                            } catch (e) {}
+                        }
+                    }
+
+                    processEvent(this, emulatedType, files, true);
                 }
-            }
-
-            if (type.type === 'waiting') {
-
-                return;
-            }
-
-            if (isError) {
-
-                if (globalError) {
-
-                    globalError.apply(_parent, returnData);
-                }
-
-                return;
-            }
-
-            if (files.length) {
-
-                this.checkQueue(files);
-            } else {
-
-                if (globalSuccess) {
-
-                    globalSuccess.apply(globalSuccess, returnData);
-                }
-            }
-        };
+            };
+        }
 
         /**
          * IE8 helper for determining script errors "onload".
+         * @param globalId {string}
          */
-        function setWindowError () {
+        function setIeWindowError (globalId) {
 
             if (window.onerror && window.onerror.__data__) {
 
@@ -414,7 +321,7 @@
 
             window.onerror = function (message, file, line) {
 
-                setObjData('winError', {message:message, file:file, line:line});
+                _settings.data.ieError = {message:message, file:file, line:line};
                 winEvent.apply(this, arguments);
             };
 
@@ -423,44 +330,211 @@
         }
 
         /**
-         * Get initialized data.
-         * @param key
-         * @returns {*|null}
+         * Process load, error, & timeout events, then start the process over for the next file.
+         * @param domContext {*}
+         * @param type {Object}
+         * @param files {Array}
+         * @param ie {boolean}
          */
-        function getObjData (key) {
+        function processEvent (domContext, type, files, ie) {
 
-            var data = null;
+            var file            = files.shift(),
+                globalId        = file.globalId,
+                isError         = (type && (type.type === 'error' || type.type === 'timeout')),
+                callback        = (isError) ? file.error : file.success,
+                returnProperties= [type.type, (file.file||null), (file||null)],
+                arrUpdates      = getObjData(file.globalId, 'update'),
+                arrSuccess      = getObjData(file.globalId, 'success'),
+                arrError        = getObjData(file.globalId, 'error');
 
-            if (_parent.__data__[_id] && _parent.__data__[_id][key]) {
+            if (domContext && domContext.parentNode && file.type === 'js' && !ie) {
 
-                data = _parent.__data__[_id][key]
+                domContext.parentNode.removeChild(domContext);
             }
 
-            return data;
+            applyCallbacks(arrUpdates, returnProperties);
+
+            if (type.type === 'waiting') {
+
+                return;
+            }
+
+            registerFileSuccess(isError, file);
+
+            if (callback) {
+
+                callback.apply(domContext, returnProperties);
+            }
+
+            if (isError) {
+
+                applyCallbacks(arrError, {success:_settings.data.filesLoaded[globalId], error:_settings.data.filesFailed[globalId]});
+
+                return;
+
+            } else {
+
+                // track number of files loaded per queue
+                _settings.data[globalId].length -= 1;
+
+                updateWaitQueue(file.id);
+            }
+
+            if (files.length) {
+
+                checkQueue(files);
+
+            } else {
+
+                if (_settings.data[globalId].length <= 0) {
+
+                    applyCallbacks(arrSuccess, {success:_settings.data.filesLoaded[globalId], error:_settings.data.filesFailed[globalId]});
+                }
+
+                files = getWaitQueue();
+
+                if (files.length) {
+
+                    checkQueue(files);
+                }
+            }
         }
 
         /**
-         * Store initialized data.
-         * @param key
-         * @param value
+         * Cycle and fire callbacks.
+         * @param callbacks
+         * @param data
          */
-        function setObjData (key, value) {
+        function applyCallbacks (callbacks, data) {
 
-            _parent.__data__[_id][key] = value;
+            if (callbacks) {
+
+                callbacks = convertArguments(callbacks);
+                data = convertArguments(data);
+
+                for (var i=0; i<callbacks.length; i++) {
+
+                    callbacks[i].apply(null, data);
+                }
+            }
         }
 
         /**
-         * Initialize/Reset stored data.
+         * Did a file load? Then apply to appropriate queue.
+         * @param isError {boolean}
+         * @param file {object}
          */
-        function resetObjData () {
+        function registerFileSuccess (isError, file) {
 
-            _id = 1e5 * Math.random();
-            _parent.__data__ = (_parent.__data__ || {});
-            _parent.__data__[_id] = {};
+            var id = file.globalId;
+
+            if (isError) {
+
+                if (!_settings.data.filesFailed[id]) {
+
+                    _settings.data.filesFailed[id] = [];
+                }
+
+                _settings.data.filesFailed[id].push(file);
+
+            } else {
+
+                if (!_settings.data.filesLoaded[id]) {
+
+                    _settings.data.filesLoaded[id] = [];
+                }
+
+                _settings.data.filesLoaded[id].push(file);
+            }
         }
 
         /**
-         * Convert arguments into an array.
+         * Store files in the global wait queue.
+         * @param file
+         */
+        function setWaitQueue (file) {
+
+            _settings.data.waitQueues.push(file);
+        }
+
+        /**
+         * Remove and return files that are ready to load from the global wait queue.
+         * @returns {Array}
+         */
+        function getWaitQueue () {
+
+            var waitQueue   = _settings.data.waitQueues,
+                getQueue    = [],
+                updatedQueue= [];
+
+            for (var i=0; i<waitQueue.length; i++) {
+
+                if (!waitQueue[i].wait.length) {
+
+                    getQueue.push(waitQueue[i]);
+                } else {
+
+                    updatedQueue.push(waitQueue[i]);
+                }
+            }
+
+            _settings.data.waitQueues = updatedQueue;
+
+            return getQueue;
+        }
+
+        /**
+         * Update wait queue files with the latest loaded ID.
+         * @param fileLoadedId
+         */
+        function updateWaitQueue (fileLoadedId) {
+
+            var waitQueues = _settings.data.waitQueues;
+
+            for (var i=0; i<waitQueues.length; i++) {
+
+                for (var k=0; k<waitQueues[i].wait.length; k++) {
+
+                    if (fileLoadedId === waitQueues[i].wait[k]) {
+
+                        waitQueues[i].wait.splice(k,1);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Get from instance storage
+         * @param id {string}
+         * @param key {string}
+         * @returns {*}
+         */
+        function getObjData (id, key) {
+
+            var setData = _settings.data[id],
+                retData = null;
+
+            if (setData && setData[key]) {
+
+                retData = setData[key]
+            }
+
+            return retData;
+        }
+
+        /**
+         * Set facet through instance storage.
+         * @param id {string}
+         * @param key {string}
+         * @param value {*}
+         */
+        function setObjData (id, key, value) {
+
+            _settings.data[id][key] = value;
+        }
+
+        /**
+         * Convert arguments to array.
          * @returns {Array}
          */
         function convertArguments () {
@@ -485,21 +559,33 @@
         }
 
         /**
-         * Exposed methods & property.
-         * @type {{files: Array, update: Function, complete: Function, success: Function, error: Function, wait: Function}}
+         * Process returned callbacks from the provided methods.
+         * @param id {string}
+         * @param key {string}
+         * @param callback {function}
+         */
+        function processCallbacks (id, key, callback) {
+
+            var value = getObjData(key);
+
+            if (!value) {
+
+                value = [];
+            }
+
+            value = convertArguments(value, callback);
+
+            setObjData(id, key, value);
+        }
+
+        /**
+         * Expose methods.
          */
         return {
 
-            files: _parent.displayFilesLoaded,
-
             update: function (callback) {
 
-                if (!_parent.update) {
-
-                    _parent.update = [];
-                }
-
-                _parent.update.push(callback);
+                processCallbacks(_settings.id, 'update', callback);
                 return this;
             },
 
@@ -512,19 +598,19 @@
 
             success: function (success) {
 
-                setObjData('success', success);
+                processCallbacks(_settings.id, 'success', success);
                 return this;
             },
 
             error: function (error) {
 
-                setObjData('error', error);
+                processCallbacks(_settings.id, 'error', error);
                 return this;
             },
 
             wait: function () {
 
-                setObjData('wait', convertArguments.apply(this, arguments));
+                processCallbacks(_settings.id, 'wait', Array.prototype.slice.call(arguments));
                 return this;
             }
         };
