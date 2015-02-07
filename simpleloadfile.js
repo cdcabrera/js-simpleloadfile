@@ -133,7 +133,7 @@
         }
 
         /**
-         * Add files to wait queue or continue with loading.
+         * Check wait queue. Add files to wait queue, or continue with loading.
          * @param files {Array}
          */
         function checkQueue (files) {
@@ -248,7 +248,7 @@
          */
         function setIeEvents (files, file, id, element, timeout) {
 
-            setIeWindowError(file.globalId);
+            setIeWindowError();
 
             element.onload = element.onreadystatechange = function (type) {
 
@@ -313,9 +313,8 @@
 
         /**
          * IE8 helper for determining script errors "onload".
-         * @param globalId {string}
          */
-        function setIeWindowError (globalId) {
+        function setIeWindowError () {
 
             if (window.onerror && window.onerror.__data__) {
 
