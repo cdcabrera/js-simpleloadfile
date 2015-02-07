@@ -71,12 +71,16 @@ resourceLoad(resources)
 
 ###Known Issues
 
-Using a combination of CSS and JS files within the same resource loader appears to cause a slight
+~~Using a combination of CSS and JS files within the same resource loader appears to cause a slight
 rearrangement of load order. In testing it appears that the CSS files are the ones out of order.
-Continuing to look for a patch on this one...
+Continuing to look for a patch on this one...~~ As of 20150206 this appears to be a non-issue with
+the latest patch.
 
-In testing IE8 there appeared a 5% failure rate on a battery of rapid reloads. However, other
-factors could have played a role since the failure appeared inconsistently.
+~~In testing IE8 there appeared a 5% failure rate on a battery of rapid reloads. However, other
+factors could have played a role since the failure appeared inconsistently.~~ As of 20150206 this
+appears to be a non-issue with the latest patch.
+
+Currently, none.
 
 
 ###Browser Compatibility
