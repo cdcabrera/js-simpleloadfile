@@ -36,9 +36,9 @@
 
     /**
      * Store data for queues.
-     * @type {{filesLoaded: {}, filesFailed: {}, waitQueues: Array, ieError: null}}
+     * @type {{filesLoaded: {}, filesFailed: {}, loadedIds: Array, waitQueues: Array, ieError: null}}
      */
-    var resourceLoadData = { filesLoaded:{}, filesFailed:{}, waitQueues:[], ieError:null };
+    var resourceLoadData = { filesLoaded:{}, filesFailed:{}, loadedIds:[], waitQueues:[], ieError:null };
 
     /**
      * Load JS and CSS files.
@@ -140,7 +140,12 @@
 
             if (!files.length) {
 
-                return;
+                files = getWaitQueue();
+
+                if (!files.length) {
+
+                    return;
+                }
             }
 
             if (files[0].wait.length) {
@@ -380,24 +385,12 @@
                 updateWaitQueue(file.id);
             }
 
-            if (files.length) {
+            if (_settings.data[globalId].length <= 0) {
 
-                checkQueue(files);
-
-            } else {
-
-                if (_settings.data[globalId].length <= 0) {
-
-                    applyCallbacks(arrSuccess, {success:_settings.data.filesLoaded[globalId], error:_settings.data.filesFailed[globalId]});
-                }
-
-                files = getWaitQueue();
-
-                if (files.length) {
-
-                    checkQueue(files);
-                }
+                applyCallbacks(arrSuccess, {success:_settings.data.filesLoaded[globalId], error:_settings.data.filesFailed[globalId]});
             }
+
+            checkQueue(files);
         }
 
         /**
@@ -463,18 +456,31 @@
          */
         function getWaitQueue () {
 
-            var waitQueue   = _settings.data.waitQueues,
+            var waitQueues  = _settings.data.waitQueues,
+                loadedIds   = _settings.data.loadedIds.join(','),
                 getQueue    = [],
                 updatedQueue= [];
 
-            for (var i=0; i<waitQueue.length; i++) {
+            for (var i=0; i<waitQueues.length; i++) {
 
-                if (!waitQueue[i].wait.length) {
+                var newWait = [];
 
-                    getQueue.push(waitQueue[i]);
+                for (var k=0; k<waitQueues[i].wait.length; k++) {
+
+                    if (loadedIds.indexOf(waitQueues[i].wait[k]) < 0) {
+
+                        newWait.push(waitQueues[i].wait[k]);
+                    }
+                }
+
+                waitQueues[i].wait = newWait;
+
+                if (waitQueues[i].wait.length) {
+
+                    updatedQueue.push(waitQueues[i]);
                 } else {
 
-                    updatedQueue.push(waitQueue[i]);
+                    getQueue.push(waitQueues[i]);
                 }
             }
 
@@ -489,18 +495,7 @@
          */
         function updateWaitQueue (fileLoadedId) {
 
-            var waitQueues = _settings.data.waitQueues;
-
-            for (var i=0; i<waitQueues.length; i++) {
-
-                for (var k=0; k<waitQueues[i].wait.length; k++) {
-
-                    if (fileLoadedId === waitQueues[i].wait[k]) {
-
-                        waitQueues[i].wait.splice(k,1);
-                    }
-                }
-            }
+            _settings.data.loadedIds.push(fileLoadedId);
         }
 
         /**
