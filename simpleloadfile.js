@@ -560,7 +560,7 @@
          */
         function processCallbacks (id, key, callback) {
 
-            var value = getObjData(key);
+            var value = getObjData(id, key);
 
             if (!value) {
 
