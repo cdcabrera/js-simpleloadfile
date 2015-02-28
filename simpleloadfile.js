@@ -510,7 +510,7 @@
 
             if (setData && setData[key]) {
 
-                retData = setData[key]
+                retData = setData[key];
             }
 
             return retData;
@@ -560,7 +560,7 @@
          */
         function processCallbacks (id, key, callback) {
 
-            var value = getObjData(key);
+            var value = getObjData(id, key);
 
             if (!value) {
 
