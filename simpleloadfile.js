@@ -510,7 +510,7 @@
 
             if (setData && setData[key]) {
 
-                retData = setData[key]
+                retData = setData[key];
             }
 
             return retData;
