@@ -32,6 +32,7 @@
 
             update: function (callback) {
 
+                internalStorage.put(settings.id, 'update', callback);
                 return this;
             },
 
@@ -44,16 +45,19 @@
 
             success: function (callback) {
 
+                internalStorage.put(settings.id, 'success', callback);
                 return this;
             },
 
             error: function (callback) {
 
+                internalStorage.put(settings.id, 'error', callback);
                 return this;
             },
 
             wait: function () {
 
+                internalStorage.put(settings.id, 'wait', [].slice.call(arguments));
                 return this;
             }
         };
