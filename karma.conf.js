@@ -1,93 +1,76 @@
 // Karma configuration
-// Generated on Wed May 06 2015 15:58:47 GMT-0400 (EDT)
+// Generated on Wed Sep 16 2015 03:17:51 GMT-0400 (EDT)
 
 module.exports = function(config) {
-
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
-            basePath: './',
+        basePath: './',
 
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-            frameworks: ['jasmine'],
+        frameworks: ['jasmine'],
 
 
         // list of files / patterns to load in the browser
-            files: [
-                'src/**/*.js',
-                'src/**/*.htm',
-                'src/**/*.html',
-                'src/**/*.json'
-            ],
+        files: [
+            'src/**/*.js',
+            'src/**/*.htm',
+            'src/**/*.html',
+            'src/**/*.json'
+        ],
 
 
         // list of files to exclude
-            exclude: [
-                'src/config.js'
-            ],
+        exclude: [
+        ],
 
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-            preprocessors: {
-                'src/**/*.htm': ['ng-html2js'],
-                'src/**/*.html': ['ng-html2js'],
-                'src/**/*.json': ['ng-json2js']
-            },
+        preprocessors: {
+        },
 
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-            reporters: ['progress'],
+        reporters: ['progress'],
 
 
         // web server port
-            port: 9876,
+        port: 9876,
 
 
         // enable / disable colors in the output (reporters and logs)
-            colors: true,
+        colors: true,
 
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-            logLevel: config.LOG_INFO,
+        logLevel: config.LOG_INFO,
 
 
         // enable / disable watching file and executing tests whenever any file changes
-            autoWatch: true,
+        autoWatch: true,
 
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-            //browsers: ['Chrome'],
-            browsers: ['PhantomJS'],
-
+        //browsers: ['PhantomJS', 'Chrome', 'Firefox'],
+            browsers: ['Chrome'],
 
         //Plugins
             plugins: [
-                'karma-jasmine',
-                'karma-chrome-launcher',
-                'karma-firefox-launcher',
-                'karma-phantomjs-launcher',
-                'karma-ng-json2js-preprocessor',
-                'karma-ng-html2js-preprocessor'
+              'karma-jasmine',
+              'karma-chrome-launcher',
+              'karma-firefox-launcher',
+              'karma-phantomjs-launcher'
             ],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-            singleRun: false,
-
-            ngHtml2JsPreprocessor: {
-                moduleName: 'htmlTemplates',
-                stripPrefix: 'src/'
-            },
-
-            ngJson2JsPreprocessor: {
-                stripPrefix: 'src/'
-            }
-    });
+        singleRun: false
+    })
 };

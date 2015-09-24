@@ -65,12 +65,14 @@
      */
     _gulp.task('js', ['clean', 'js-hint'], function () {
 
-        var version = '//@version ' + _settings.version +', '+ _settings.date + '\n',
-            wrapper = '//@file <%= file.path.split("/").pop() %>\n<%= contents %>';
+        var version     = '//@version ' + _settings.version +', '+ _settings.date + '\n',
+            wrapper     = '//@file <%= file.path.split("/").pop() %>\n<%= contents %>',
+            iffeWrapper = '(function(window,undefined){\n"use strict";\n<%= contents %>\n})(this);';
 
         _gulp.src(_settings.jsMatch, { base: _settings.servePath })
             .pipe(_wrap(wrapper))
             .pipe(_concat(_settings.distJsFile))
+            .pipe(_wrap(iffeWrapper))
             .pipe(_insert.prepend(version))
             .pipe(_gulp.dest(_settings.dist));
     });
