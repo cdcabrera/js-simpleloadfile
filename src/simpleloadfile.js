@@ -25,6 +25,8 @@
 
         setTimeout(function(){
 
+            processFiles(settings);
+
         },0);
 
 
