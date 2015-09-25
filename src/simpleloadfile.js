@@ -25,7 +25,7 @@
 
         setTimeout(function(){
 
-            queue.check( processFiles(settings) );
+            events.load( queue.check( processFiles(settings) ) );
 
         },0);
 

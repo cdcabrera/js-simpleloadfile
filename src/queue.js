@@ -76,7 +76,7 @@
                 if (files[0].wait.length) {
 
                     internalStorage.put('waitQueues', files[0]);
-                    //events.next(null, {type: 'waiting'}, [files[0]]);
+                    events.next(null, {type: 'waiting'}, [files[0]]);
 
                     files.shift();
 
