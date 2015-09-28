@@ -2,8 +2,8 @@
 
     var _packageJson    = require('./package.json'),
         _browserSync    = require('browser-sync'),
+        _argv           = require('yargs').argv,
         _gulp           = require('gulp'),
-        _less           = require('gulp-less'),
         _clean          = require('gulp-clean'),
         _concat         = require('gulp-concat'),
         _jshint         = require('gulp-jshint'),
@@ -19,7 +19,7 @@
 
         genericMatch:   ['./src/**/*.md'],
         jsMatch:        ['./src/**/*.js', '!src/**/*.dev.js', '!src/**/*_spec.js'],
-
+        noieJsMatch:    ['!/src/**/ie*.js'],
         demoMatch:      ['./src/index.htm', './src/index.html'],
 
 
@@ -67,9 +67,15 @@
 
         var version     = '//@version ' + _settings.version +', '+ _settings.date + '\n',
             wrapper     = '//@file <%= file.path.split("/").pop() %>\n<%= contents %>',
-            iffeWrapper = '(function(window,undefined){\n"use strict";\n<%= contents %>\n})(this);';
+            iffeWrapper = '(function(window,undefined){\n"use strict";\n<%= contents %>\n})(this);',
+            jsfiles     = _settings.jsMatch;
 
-        _gulp.src(_settings.jsMatch, { base: _settings.servePath })
+        if (_argv.noie) {
+
+            jsfiles = jsfiles.concat(_settings.noieJsMatch);
+        }
+
+        _gulp.src(jsfiles, { base: _settings.servePath })
             .pipe(_wrap(wrapper))
             .pipe(_concat(_settings.distJsFile))
             .pipe(_wrap(iffeWrapper))
