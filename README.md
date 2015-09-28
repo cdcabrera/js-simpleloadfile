@@ -2,13 +2,6 @@
 
 A resource loader for JS and CSS files.
 
-##The NEW...
-
-Updated to provide a group of chained methods, and a loaded property. This includes a success, error, a
-global update, and a wait que.
-
-
-
 ###How it works
 
 Basic setup...
@@ -71,15 +64,6 @@ resourceLoad(resources)
 
 ###Known Issues
 
-~~Using a combination of CSS and JS files within the same resource loader appears to cause a slight
-rearrangement of load order. In testing it appears that the CSS files are the ones out of order.
-Continuing to look for a patch on this one...~~ As of 20150206 this appears to be a non-issue with
-the latest patch.
-
-~~In testing IE8 there appeared a 5% failure rate on a battery of rapid reloads. However, other
-factors could have played a role since the failure appeared inconsistently.~~ As of 20150206 this
-appears to be a non-issue with the latest patch.
-
 Currently, none.
 
 
@@ -96,12 +80,61 @@ browsers may work correctly, but they also have the potential to fire the incorp
 loaded file and "contextfail" message within callback parameters.
 
 
-###License
+##Serve, Test, & Build...
+
+If you're looking to roll through the same process and compile your own...
+
+###Setup your environment
+
+Fork and clone the repository. From the terminal change directories into the root of the repository and run...
+
+```
+$ npm install
+```
+
+###Serve the app locally
+
+To serve the repo locally from the "./src" directory simply...
+
+```
+$ npm run serve
+```
+
+Once you serve up the application locally you can navigate here. The
+NodeJS server should automatically open the browser...
+
+```
+/index.dev.htm
+```
+
+###Basic Unit Tests
+
+To run basic unit tests...
+
+```
+$ npm run unit
+```
+
+This should let you run the related Karma/Jasmine unit tests label with "_spec".
+
+
+###Build the script
+
+To compile/build the final script into the "./dist" directory... You'll generate both a concatenated and a minified version of the
+final script.
+
+```
+$ npm run build
+```
+
+
+
+##License
 
 My aspect is released under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
-I did reference aspects of the jQuery 1.8 API ajaxTransport "cross domain" method for handling script
-loading. However, alterations were made based on the way IE loves to fire readystate and onload.
+Originally, I did reference aspects of the jQuery 1.8 API ajaxTransport "cross domain" method for handling script
+loading. However, alterations have been made based on the way IE loves to fire readystate and onload.
 jQuery is copyrighted Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors. And jQuery is
 licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License).
 
