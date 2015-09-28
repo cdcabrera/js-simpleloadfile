@@ -86,7 +86,7 @@ If you're looking to roll through the same process and compile your own...
 
 ###Setup your environment
 
-Fork and clone the repository. From the terminal change directories into the root of the repository and run...
+Fork and/or clone the repository. From the terminal change directories into the root of the repository and run...
 
 ```
 $ npm install
@@ -100,8 +100,8 @@ To serve the repo locally from the "./src" directory simply...
 $ npm run serve
 ```
 
-Once you serve up the application locally you can navigate here. The
-NodeJS server should automatically open the browser...
+Once you serve up the pre-compiled script locally you can navigate here. The
+browser should automatically open...
 
 ```
 /index.dev.htm
