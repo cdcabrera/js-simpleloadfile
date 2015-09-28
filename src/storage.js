@@ -46,6 +46,18 @@
                     case 'wait':
                     case 'success':
                     case 'error':
+
+                        if (ret && ret[prop]) {
+
+                            ret = ret[prop];
+
+                        } else {
+
+                            ret = undefined;
+                        }
+
+                        break;
+
                     default:
 
                         if (ret && ret[prop]) {
@@ -77,8 +89,8 @@
 
                         break;
 
-                    case 'filesLoaded':
-                    case 'filesFailed':
+                    //case 'filesLoaded':
+                    //case 'filesFailed':
                     default:
 
                         if (!window.ResourceLoad.internal[key]) {
