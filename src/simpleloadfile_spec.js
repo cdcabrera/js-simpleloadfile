@@ -2,7 +2,7 @@
 describe('Module, SimpleLoadFile', function () {
 
     var injected = {
-        method:         window.resourceLoad,
+        method:         window.simpleLoadFile,
         exec:           undefined
     };
 
