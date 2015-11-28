@@ -1,0 +1,44 @@
+{
+    "name": "JS-SimpleLoadFile",
+    "version": "1.6.0",
+    "description": "A resource loader for JS and CSS files.",
+    "scripts": {
+
+        "build": "gulp build",
+        "serve": "gulp serve",
+        "test": "karma start"
+    },
+    "respository": {
+        "type": "git",
+        "url": "https://github.com/cdcabrera/js-simpleloadfile.git"
+    },
+    "keywords": [],
+    "author": "CD Cabrera",
+    "license": "MIT",
+    "engines": {
+        "node": ">=0.12.2"
+    },
+    "devDependencies": {
+
+        "browser-sync": "^2.5.2",
+
+        "gulp": "~3.8.10",
+        "gulp-clean": "^0.3.1",
+        "gulp-concat": "^2.4.3",
+        "gulp-rename": "^1.2.0",
+        "gulp-uglify": "^1.1.0",
+        "gulp-jshint": "^1.10.0",
+        "gulp-insert": "^0.4.0",
+        "gulp-wrap": "^0.11.0",
+
+        "jasmine-core": "^2.2.0",
+        "karma": "^0.12.31",
+        "karma-cli": "^0.0.4",
+        "karma-jasmine": "^0.3.5",
+        "karma-chrome-launcher": "^0.1.7",
+        "karma-firefox-launcher": "^0.1.4",
+        "karma-phantomjs-launcher": "^0.1.4",
+
+        "phantomjs": "^1.9.16"
+    }
+}
