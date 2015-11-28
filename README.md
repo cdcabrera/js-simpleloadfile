@@ -112,7 +112,7 @@ browser should automatically open...
 To run basic unit tests...
 
 ```
-$ npm run unit
+$ npm test
 ```
 
 This should let you run the related Karma/Jasmine unit tests label with "_spec".

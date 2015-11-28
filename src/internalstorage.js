@@ -42,7 +42,29 @@
      */
     InternalStorage.prototype.get = function(key, type) {
 
+        var ret = this.internal[key];
 
+        switch(type)
+        {
+            //case 'update':
+            //case 'wait':
+            //case 'success':
+            //case 'error':
+            default:
+
+                if (ret && ret[type]) {
+
+                    ret = ret[type];
+
+                } else {
+
+                    ret = undefined;
+                }
+
+                break;
+        }
+
+        return ret || null;
     };
 
 
@@ -60,7 +82,7 @@
             case 'loadedIds':
             case 'waitQueues':
 
-                this.internal[key] = convertArguments(this.internal[key], type);
+                this.internal[key] = convertArguments(this.internal[key] || [], type);
 
                 break;
 
@@ -73,10 +95,12 @@
                     this.internal[key] = {};
                 }
 
-                this.internal[key][type] = convertArguments(this.internal[key][type], [].slice.call(arguments, 2));
+                this.internal[key][type] = convertArguments(this.internal[key][type] || [], value);
 
                 break;
         }
+
+        return this;
     };
 
 
@@ -88,5 +112,5 @@
      */
     InternalStorage.prototype.reset = function(key, value) {
 
-
+        return this;
     };

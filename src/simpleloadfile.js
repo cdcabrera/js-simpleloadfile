@@ -19,8 +19,8 @@
 
         } else {
 
+            defaultSettings.files = [].slice.call(arguments);
             settings = defaultSettings;
-            settings.files = [].slice.call(arguments);
         }
 
         return new SimpleLoadFile(settings);
@@ -37,12 +37,14 @@
      */
     function SimpleLoadFile(settings) {
 
+        var processed;
+
         this.settings           = settings;
         this.internalStorage    = new InternalStorage();
 
         setTimeout(function(){
 
-
+            processed = processFiles(settings);
 
 
         },0);
