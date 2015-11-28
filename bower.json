@@ -1,0 +1,30 @@
+{
+    "name": "JS-SimpleLoadFile",
+    "version": "1.6.0",
+    "authors": [
+
+        "cabrera.code@gmail.com"
+    ],
+    "license": "MIT",
+    "ignore": [
+
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "src",
+        "test",
+        "tests",
+        "*.js",
+        "package.json"
+    ],
+    "main": [
+
+        "dist/simpleloadfile.js"
+    ],
+    "dependencies": {
+
+    },
+    "devDependencies": {
+
+    }
+}

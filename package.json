@@ -1,6 +1,6 @@
 {
     "name": "JS-SimpleLoadFile",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "description": "A resource loader for JS and CSS files.",
     "scripts": {
 
@@ -37,6 +37,8 @@
         "karma-jasmine": "^0.3.5",
         "karma-chrome-launcher": "^0.1.7",
         "karma-firefox-launcher": "^0.1.4",
-        "karma-phantomjs-launcher": "^0.1.4"
+        "karma-phantomjs-launcher": "^0.1.4",
+
+        "phantomjs": "^1.9.16"
     }
 }
