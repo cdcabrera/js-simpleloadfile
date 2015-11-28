@@ -1,10 +1,13 @@
 
 describe('Module, SimpleLoadFile', function () {
 
+
+
     var injected = {
         method:         window.simpleLoadFile,
         exec:           undefined
     };
+
 
 
     // execute
@@ -14,11 +17,13 @@ describe('Module, SimpleLoadFile', function () {
     });
 
 
+
     // is it defined
     it('should be a defined module', function () {
 
         expect(injected.method).toBeDefined();
     });
+
 
 
     // does it have methods
@@ -34,6 +39,7 @@ describe('Module, SimpleLoadFile', function () {
 
         expect(injected.exec.wait).toBeDefined();
     });
+
 
 
     // does the defined method allow chained methods
